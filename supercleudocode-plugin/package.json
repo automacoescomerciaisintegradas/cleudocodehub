@@ -4,6 +4,7 @@
   "description": "Superplugin for Cleudocode Hub - Complete software development workflow",
   "author": "Cleudocode Hub Team",
   "license": "MIT",
+  "type": "module",
   "cleudocode": {
     "type": "plugin",
     "minVersion": "1.0.0"
@@ -18,6 +19,7 @@
     "commands/**/*",
     "agents/**/*",
     "docs/**/*",
+    "lib/**/*",
     ".cleudocode-plugin/**/*"
   ]
 }
