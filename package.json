@@ -1,5 +1,5 @@
 {
-  "name": "@cleudocode/cleudocode-core",
+  "name": "cleudocode-core",
   "version": "1.0.0",
   "description": "Cleudocode Core - AI Orchestration Framework para desenvolvimento com agentes AI",
   "author": "Cleudocode Team",
@@ -48,7 +48,8 @@
     "semver": "^7.7.1"
   },
   "publishConfig": {
-    "registry": "https://npm.pkg.github.com"
+    "registry": "https://registry.npmjs.org",
+    "access": "public"
   },
   "engines": {
     "node": ">=18.0.0",
