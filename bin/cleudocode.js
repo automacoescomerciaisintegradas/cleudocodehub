@@ -970,6 +970,107 @@ program
   })
 
 // =============================================================================
+// COMANDO: swarm - SWARM DE AGENTES SEMÂNTICOS
+// =============================================================================
+program
+  .command('swarm [task]')
+  .description('🐝 Semantic Agent Swarm - Enxame de Agentes IA')
+  .option('-t, --task <descricao>', 'Descrição da tarefa')
+  .option('-a, --agents <numero>', 'Número de agentes (3-10)', '5')
+  .option('-m, --mode <modo>', 'Modo: democratic|consensus|leader', 'democratic')
+  .option('--verbose', 'Output detalhado')
+  .action(async (task, options) => {
+    p.intro(chalk.bgBlue.black(' SEMANTIC AGENT SWARM '))
+
+    console.log(chalk.blue.bold('\n🐝 SWARM DE AGENTES SEMÂNTICOS 🐝'))
+    console.log(chalk.blue('Múltiplos agentes IA trabalhando juntos\n'))
+
+    let taskDesc = options.task || task
+
+    if (!taskDesc) {
+      taskDesc = await p.text({
+        message: 'Qual tarefa o swarm deve executar?',
+        placeholder: 'ex: Criar API REST com autenticação JWT'
+      })
+
+      if (p.isCancel(taskDesc)) {
+        p.cancel('Operação cancelada')
+        return
+      }
+    }
+
+    const numAgents = Math.min(Math.max(parseInt(options.agents) || 5, 3), 10)
+
+    console.log(chalk.blue(`🎯 Tarefa: ${taskDesc}`))
+    console.log(chalk.blue(`🐝 Agentes: ${numAgents}`))
+    console.log(chalk.blue(`📊 Modo: ${options.mode}\n`))
+
+    try {
+      // Importar módulo Swarm
+      const { SemanticAgentSwarm } = await import(
+        join(__dirname, '../supercleudocode-plugin/lib/semantic-swarm.js')
+      )
+
+      // Criar swarm
+      const swarm = new SemanticAgentSwarm({
+        maxAgents: numAgents,
+        coordinationStrategy: options.mode,
+        verbose: options.verbose || false
+      })
+
+      // Event listeners
+      swarm.on('coordination', (data) => {
+        console.log(chalk.dim(`  [COORDINATION] ${JSON.stringify(data.decision)}`))
+      })
+
+      swarm.on('architecture', (data) => {
+        console.log(chalk.dim(`  [ARCHITECTURE] Pattern: ${data.architecture?.pattern}`))
+      })
+
+      swarm.on('development', (data) => {
+        console.log(chalk.dim(`  [DEVELOPMENT] Files: ${data.files?.length || 0}`))
+      })
+
+      swarm.on('review', (data) => {
+        console.log(chalk.dim(`  [REVIEW] Score: ${data.qualityScore}/10`))
+      })
+
+      swarm.on('testing', (data) => {
+        console.log(chalk.dim(`  [TESTING] Coverage: ${data.coverage}%`))
+      })
+
+      swarm.on('consensus', (data) => {
+        console.log(chalk.dim(`  [CONSENSUS] ${data.decision} (${(data.score * 100).toFixed(0)}%)`))
+      })
+
+      // Inicializar swarm
+      swarm.initialize(taskDesc)
+
+      // Executar tarefa
+      const result = await swarm.execute({
+        type: 'feature',
+        description: taskDesc
+      })
+
+      // Gerar relatório
+      swarm.generateReport({ description: taskDesc }, result)
+
+      if (result.success) {
+        p.outro(chalk.green('✅ Swarm completado com sucesso!'))
+      } else {
+        p.outro(chalk.yellow('⚠️  Swarm não alcançou consenso'))
+      }
+
+    } catch (error) {
+      p.log.error(chalk.red(`Erro: ${error.message}`))
+      p.outro(chalk.red('❌ Swarm falhou'))
+      if (options.verbose) {
+        console.error(error.stack)
+      }
+    }
+  })
+
+// =============================================================================
 // HELP PERSONALIZADO
 // =============================================================================
 program.addHelpText('after', `
@@ -982,7 +1083,8 @@ ${chalk.bold('Exemplos:')}
   ${chalk.cyan('cleudocode-core run dev -t "criar API"')} Executa agente
   ${chalk.cyan('cleudocode-core plugin install supercleudocode-plugin')} Instala SuperCleudocode
   ${chalk.cyan('cleudocode-core super-skill --list')}    Lista Super-Skills
-  ${chalk.cyan('cleudocode-core yolo "minha feature"')}  🚀 YOLO MODE - Desenvolvimento automático
+  ${chalk.cyan('cleudocode-core yolo "minha feature"')}  🚀 YOLO MODE
+  ${chalk.cyan('cleudocode-core swarm "API REST"')}      🐝 SWARM DE AGENTES
 
 ${chalk.bold('SuperCleudocode Commands:')}
   ${chalk.cyan('super-skill [nome]')}       Ativa ou mostra skill
@@ -993,7 +1095,8 @@ ${chalk.bold('SuperCleudocode Commands:')}
   ${chalk.cyan('super-debug [issue]')}      Inicia debug
   ${chalk.cyan('super-deploy [env]')}       Deploy para ambiente
   ${chalk.cyan('super-init [projeto]')}     Inicializa projeto
-  ${chalk.cyan('yolo [feature]')}           🚀 YOLO MODE - Desenvolvimento automático end-to-end
+  ${chalk.cyan('yolo [feature]')}           🚀 YOLO MODE - Desenvolvimento automático
+  ${chalk.cyan('swarm [task]')}             🐝 SWARM - Agentes semânticos
 
 ${chalk.bold('Links:')}
   Documentação: https://github.com/cleudocode/cleudocode-core
@@ -1001,6 +1104,7 @@ ${chalk.bold('Links:')}
   NPM: https://www.npmjs.com/package/cleudocode-core
   SuperCleudocode: supercleudocode-plugin/README.md
   YOLO Mode: supercleudocode-plugin/lib/yolo-mode.js
+  Semantic Swarm: supercleudocode-plugin/lib/semantic-swarm.js
 `)
 
 // =============================================================================
