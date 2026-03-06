@@ -1075,19 +1075,22 @@ program
 // =============================================================================
 program
   .command('marketplace [acao] [nome]')
-  .description('🔌 Skills Marketplace - 160,566+ skills')
+  .description('🔌 Skills Marketplace - 86,396+ skills (skills.sh)')
   .option('-s, --search <query>', 'Buscar skills')
   .option('-i, --install <skill>', 'Instalar skill')
   .option('-l, --list', 'Listar skills')
   .option('-c, --category <nome>', 'Listar por categoria')
   .option('--enable <skill>', 'Ativar skill')
   .option('--disable <skill>', 'Desativar skill')
+  .option('--hot', 'Hot skills (1h)')
+  .option('--trending', 'Trending skills (24h)')
+  .option('--all-time', 'All-time top skills')
   .option('--stats', 'Estatísticas do marketplace')
   .action(async (acao, nome, options) => {
     p.intro(chalk.bgBlue.black(' SKILLS MARKETPLACE '))
 
     console.log(chalk.blue.bold('\n🔌 Skills Marketplace Integration'))
-    console.log(chalk.blue('160,566+ skills disponíveis\n'))
+    console.log(chalk.blue('86,396+ skills disponíveis via skills.sh\n'))
 
     try {
       // Importar módulo Marketplace
@@ -1097,6 +1100,51 @@ program
 
       const marketplace = new SkillsMarketplaceIntegration()
       await marketplace.initialize()
+
+      // Hot skills (última hora)
+      if (options.hot) {
+        const hotSkills = await marketplace.getHotSkills(20)
+        console.log(chalk.bgRed.black(' 🔥 HOT SKILLS (1h) '))
+        console.log()
+        hotSkills.forEach(skill => {
+          console.log(chalk.yellow(`  #${skill.rank} ${skill.name}`))
+          console.log(chalk.dim(`     Repo: ${skill.repository}`))
+          console.log(chalk.dim(`     1H: ${skill.installs1h} installs (${skill.change})`))
+          console.log()
+        })
+        p.outro(chalk.green(`✅ Top ${hotSkills.length} hot skills`))
+        return
+      }
+
+      // Trending skills (24h)
+      if (options.trending) {
+        const trendingSkills = await marketplace.getTrendingSkills(20)
+        console.log(chalk.bgCyan.black(' 📈 TRENDING SKILLS (24h) '))
+        console.log()
+        trendingSkills.forEach(skill => {
+          console.log(chalk.cyan(`  #${skill.rank} ${skill.name}`))
+          console.log(chalk.dim(`     Repo: ${skill.repository}`))
+          console.log(chalk.dim(`     24H: ${skill.installs24h} installs (${skill.growth})`))
+          console.log()
+        })
+        p.outro(chalk.green(`✅ Top ${trendingSkills.length} trending skills`))
+        return
+      }
+
+      // All-time skills
+      if (options.allTime || acao === 'all-time') {
+        const allTimeSkills = await marketplace.getAllTimeSkills(20)
+        console.log(chalk.bgYellow.black(' 🏆 ALL-TIME TOP SKILLS '))
+        console.log()
+        allTimeSkills.forEach(skill => {
+          console.log(chalk.yellow(`  #${skill.rank} ${skill.name}`))
+          console.log(chalk.dim(`     Repo: ${skill.repository}`))
+          console.log(chalk.dim(`     Total: ${skill.totalInstalls} installs`))
+          console.log()
+        })
+        p.outro(chalk.green(`✅ Top ${allTimeSkills.length} all-time skills`))
+        return
+      }
 
       if (options.search) {
         const results = await marketplace.searchSkills(options.search)
@@ -1171,8 +1219,10 @@ program
 
       p.log.warn('Ação não especificada')
       p.log.info('Use: cleudocode-core marketplace --list')
+      p.log.info('     cleudocode-core marketplace --hot')
+      p.log.info('     cleudocode-core marketplace --trending')
+      p.log.info('     cleudocode-core marketplace --all-time')
       p.log.info('     cleudocode-core marketplace --search "query"')
-      p.log.info('     cleudocode-core marketplace --install skill-name')
       p.log.info('     cleudocode-core marketplace --stats')
 
     } catch (error) {
