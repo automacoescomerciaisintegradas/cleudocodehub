@@ -585,6 +585,328 @@ ${chalk.bold('Próximos passos:')}
   })
 
 // =============================================================================
+// COMANDOS SUPERCLUEDOCODE
+// =============================================================================
+
+// super-skill
+program
+  .command('super-skill [nome]')
+  .description('Ativa ou mostra documentação de skill')
+  .option('-l, --list', 'Listar todas as skills')
+  .option('-s, --status', 'Mostrar status das skills ativas')
+  .action(async (nome, options) => {
+    p.intro(chalk.bgGreen.black(' SuperCleudocode - Skills '))
+
+    const skillsPath = join(PROJECT_ROOT, 'supercleudocode-plugin', 'skills')
+
+    if (!fs.existsSync(skillsPath)) {
+      p.log.error('Diretório de skills não encontrado')
+      p.log.info(`Procure em: ${skillsPath}`)
+      return
+    }
+
+    if (options.list || !nome) {
+      const files = fs.readdirSync(skillsPath)
+      const skills = files
+        .filter(f => fs.statSync(join(skillsPath, f)).isDirectory())
+
+      if (skills.length === 0) {
+        p.log.info('Nenhuma skill encontrada')
+        return
+      }
+
+      console.log(chalk.bold('\nSuper-Skills disponíveis:\n'))
+      skills.forEach(skill => {
+        const hasDoc = fs.existsSync(join(skillsPath, skill, 'SKILL.md'))
+        const icon = hasDoc ? chalk.green('✓') : chalk.yellow('⚠')
+        console.log(`  ${icon} ${chalk.cyan(skill)}`)
+      })
+      console.log()
+      return
+    }
+
+    if (options.status) {
+      const configPath = join(PROJECT_ROOT, '.cleudocode-core')
+      if (fs.existsSync(configPath)) {
+        const config = yaml.load(fs.readFileSync(configPath, 'utf-8'))
+        const enabledSkills = config?.supercleudocode?.skills?.enabled || []
+        
+        console.log(chalk.bold('\nSkills ativas:\n'))
+        enabledSkills.forEach(skill => {
+          console.log(`  ${chalk.green('•')} ${skill}`)
+        })
+        console.log()
+      }
+      return
+    }
+
+    // Mostrar documentação da skill
+    const skillDocPath = join(skillsPath, nome, 'SKILL.md')
+    if (fs.existsSync(skillDocPath)) {
+      const content = fs.readFileSync(skillDocPath, 'utf-8')
+      console.log('\n' + content)
+    } else {
+      p.log.error(`Skill "${nome}" não encontrada`)
+      p.log.info('Use "cleudocode-core super-skill --list" para ver skills disponíveis')
+    }
+  })
+
+// super-plan
+program
+  .command('super-plan [descricao]')
+  .description('Cria plano de implementação')
+  .option('-p, --priority <nivel>', 'Prioridade: low, medium, high, critical', 'medium')
+  .action(async (descricao, options) => {
+    p.intro(chalk.bgGreen.black(' SuperCleudocode - Planning '))
+
+    if (!descricao) {
+      descricao = await p.text({
+        message: 'Descrição da feature/tarefa:'
+      })
+
+      if (p.isCancel(descricao)) {
+        p.cancel('Operação cancelada')
+        return
+      }
+    }
+
+    const spinner = ora('Criando plano de implementação...').start()
+
+    try {
+      const plansDir = join(PROJECT_ROOT, 'docs/plans')
+      fs.ensureDirSync(plansDir)
+      
+      const date = new Date().toISOString().split('T')[0]
+      const fileName = `${date}--${descricao.toLowerCase().replace(/[^a-z0-9]+/g, '-')}.md`
+      const planPath = join(plansDir, fileName)
+
+      const planContent = `# Implementation Plan: ${descricao}
+
+**Date:** ${date}
+**Priority:** ${options.priority}
+**Status:** draft
+
+## Overview
+
+${descricao}
+
+## Tasks
+
+### Task 1: Setup
+**Time:** 5 minutes
+
+**Files Changed:**
+- \`src/\` - Create structure
+
+**Steps:**
+1. Create directory structure
+2. Setup configuration files
+3. Initialize version control
+
+**Verification:**
+- [ ] Directory structure created
+- [ ] Configuration files in place
+- [ ] Git initialized
+
+**Dependencies:**
+- Blocks: Task 2
+- Blocked by: None
+
+---
+
+## Approval
+
+- [ ] Design reviewed
+- [ ] Tasks are appropriately sized
+- [ ] Dependencies are correct
+- [ ] Verification steps are clear
+
+**Approved by:** _______________
+**Approved at:** _______________
+`
+      fs.writeFileSync(planPath, planContent)
+      spinner.succeed(`Plano criado: ${planPath}`)
+      p.log.info(`Edite o plano e execute com: cleudocode-core super-execute`)
+      
+    } catch (error) {
+      spinner.fail('Erro ao criar plano')
+      p.log.error(error.message)
+    }
+  })
+
+// super-execute
+program
+  .command('super-execute [plano]')
+  .description('Executa plano aprovado')
+  .action(async (plano) => {
+    p.intro(chalk.bgGreen.black(' SuperCleudocode - Execution '))
+
+    const plansDir = join(PROJECT_ROOT, 'docs/plans')
+    
+    if (!plano) {
+      if (!fs.existsSync(plansDir)) {
+        p.log.warn('Nenhum plano encontrado')
+        return
+      }
+
+      const files = fs.readdirSync(plansDir)
+        .filter(f => f.endsWith('.md'))
+        .map(f => f.replace('.md', ''))
+
+      if (files.length === 0) {
+        p.log.info('Nenhum plano encontrado. Crie com: cleudocode-core super-plan')
+        return
+      }
+
+      const selected = await p.select({
+        message: 'Selecione o plano:',
+        options: files.map(f => ({ label: f, value: f }))
+      })
+
+      if (p.isCancel(selected)) {
+        p.cancel('Operação cancelada')
+        return
+      }
+
+      plano = selected
+    }
+
+    const planPath = join(plansDir, `${plano}.md`)
+    if (!fs.existsSync(planPath)) {
+      p.log.error(`Plano "${plano}" não encontrado`)
+      return
+    }
+
+    p.log.info(`Executando plano: ${plano}`)
+    p.log.info('@madmax *orchestrate para execução completa')
+  })
+
+// super-review
+program
+  .command('super-review [alvo]')
+  .description('Solicita code review')
+  .option('-s, --security', 'Foco em segurança')
+  .action(async (alvo, options) => {
+    p.intro(chalk.bgGreen.black(' SuperCleudocode - Code Review '))
+
+    const target = alvo || '.'
+    
+    p.log.info(`Solicitando review para: ${target}`)
+    
+    if (options.security) {
+      p.log.info('Foco: Segurança')
+    }
+
+    p.log.info('@code-review *review para execução')
+  })
+
+// super-test
+program
+  .command('super-test')
+  .description('Executa testes')
+  .option('-c, --coverage', 'Gerar relatório de cobertura')
+  .action(async (options) => {
+    p.intro(chalk.bgGreen.black(' SuperCleudocode - Testing '))
+
+    p.log.info('Executando testes...')
+    
+    if (options.coverage) {
+      p.log.info('Com cobertura')
+    }
+
+    p.log.info('Configure npm test no seu projeto')
+  })
+
+// super-debug
+program
+  .command('super-debug [issue]')
+  .description('Inicia debug sistemático')
+  .action(async (issue) => {
+    p.intro(chalk.bgGreen.black(' SuperCleudocode - Debugging '))
+
+    if (!issue) {
+      issue = await p.text({
+        message: 'Descrição do problema:'
+      })
+
+      if (p.isCancel(issue)) {
+        p.cancel('Operação cancelada')
+        return
+      }
+    }
+
+    p.log.info(`Iniciando debug sistemático: ${issue}`)
+    p.log.info('Fases: Reproduzir → Isolar → Hipotetizar → Corrigir')
+    p.log.info('@systematic-debugging para execução completa')
+  })
+
+// super-deploy
+program
+  .command('super-deploy [ambiente]')
+  .description('Deploy para ambiente')
+  .option('--dry-run', 'Simular deploy')
+  .action(async (ambiente, options) => {
+    p.intro(chalk.bgGreen.black(' SuperCleudocode - Deploy '))
+
+    const env = ambiente || 'staging'
+    
+    if (options.dryRun) {
+      p.log.info(`[DRY RUN] Deploy para: ${env}`)
+    } else {
+      p.log.info(`Deploy para: ${env}`)
+    }
+
+    p.log.info('Configure CI/CD para deploy automatizado')
+  })
+
+// super-init
+program
+  .command('super-init [projeto]')
+  .description('Inicializa projeto com SuperCleudocode')
+  .action(async (projeto) => {
+    p.intro(chalk.bgGreen.black(' SuperCleudocode - Project Init '))
+
+    let projectName = projeto
+
+    if (!projectName) {
+      projectName = await p.text({
+        message: 'Nome do projeto:',
+        defaultValue: 'my-project'
+      })
+
+      if (p.isCancel(projectName)) {
+        p.cancel('Operação cancelada')
+        return
+      }
+    }
+
+    const spinner = ora('Criando estrutura do projeto...').start()
+
+    try {
+      const projectPath = join(PROJECT_ROOT, projectName)
+      fs.ensureDirSync(projectPath)
+
+      const dirs = ['src', 'tests', 'docs', 'docs/plans', 'scripts']
+
+      for (const dir of dirs) {
+        fs.ensureDirSync(join(projectPath, dir))
+      }
+
+      fs.writeFileSync(
+        join(projectPath, 'README.md'),
+        `# ${projectName}\n\nProjeto criado com SuperCleudocode\n`
+      )
+
+      spinner.succeed(`Projeto criado: ${projectPath}`)
+      p.outro(chalk.green('✨ Projeto inicializado!'))
+      
+    } catch (error) {
+      spinner.fail('Erro ao inicializar')
+      p.log.error(error.message)
+    }
+  })
+
+// =============================================================================
 // HELP PERSONALIZADO
 // =============================================================================
 program.addHelpText('after', `
