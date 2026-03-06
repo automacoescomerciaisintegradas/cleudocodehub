@@ -1,7 +1,7 @@
 {
   "name": "cleudocode-core",
-  "version": "1.0.0",
-  "description": "Cleudocode Core - AI Orchestration Framework para desenvolvimento com agentes AI",
+  "version": "2.0.0",
+  "description": "Cleudocode Core - Super Máquina de Criar Códigos baseada em AIOS + AIOX-Core",
   "author": "Cleudocode Team",
   "license": "MIT",
   "keywords": [
@@ -12,10 +12,19 @@
     "cli",
     "automation",
     "development",
-    "llm"
+    "llm",
+    "code-generation",
+    "aios",
+    "aiox-core"
   ],
   "type": "module",
-  "main": "src/index.js",
+  "main": "core/index.js",
+  "exports": {
+    ".": {
+      "import": "./core/index.js",
+      "require": "./core/index.esm.js"
+    }
+  },
   "bin": {
     "cleudocode": "./bin/cleudocode.js",
     "cleudocode-core": "./bin/cleudocode.js",

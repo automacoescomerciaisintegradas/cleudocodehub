@@ -1,29 +1,41 @@
 # 🚀 Cleudocode Core
 
-> **AI Orchestration Framework para Desenvolvimento com Agentes AI**
+> **Super Máquina de Criar Códigos para Desenvolvedores**
 
 [![npm version](https://img.shields.io/npm/v/cleudocode-core.svg)](https://www.npmjs.com/package/cleudocode-core)
 [![npm downloads](https://img.shields.io/npm/dm/cleudocode-core.svg)](https://www.npmjs.com/package/cleudocode-core)
 [![license](https://img.shields.io/npm/l/cleudocode-core.svg)](LICENSE)
 [![Node.js](https://img.shields.io/node/v/cleudocode-core.svg)](https://nodejs.org/)
 
-Cleudocode Core é um framework de orquestração de agentes AI que integra com seu fluxo de desenvolvimento. Configure uma vez, use em qualquer projeto.
+Cleudocode Core é uma **super máquina de criar códigos** baseada nas arquiteturas do **AIOS** e **AIOX-Core**. Gera código automaticamente, gerencia agentes AI, e executa workflows completos de desenvolvimento.
 
 ## ✨ Features
 
-- 🎯 **Instalação Rápida** - Um comando para configurar tudo
-- 🤖 **Múltiplos Agentes** - Suporte a agentes especializados
-- 🔌 **Multi-LLM** - OpenAI, Anthropic, Gemini, Ollama, vLLM, HuggingFace
-- 📝 **Regras de Código** - Linting, formatação e padrões automáticos
-- 🔄 **Workflows** - Automação de tarefas repetitivas
-- 🛠️ **CLI Poderosa** - Comandos intuitivos e fáceis de usar
-- 📚 **Documentação** - Geração automática de docs
+### 🧠 Core Poderoso
+- **Orquestração de Agentes** - Gerencie múltiplos agentes AI especializados
+- **Geração de Código** - Crie código automaticamente em JavaScript, TypeScript, Python
+- **Workflows** - Execute fluxos completos (feature development, bug fix, code review)
+- **Elicitação Interativa** - Prompting inteligente para coletar requisitos
+- **Memória e Contexto** - Mantenha contexto entre sessões
+- **Quality Gates** - Code review automático, linting, testes, segurança
+
+### 🤖 Agentes Especializados
+- `@architect` - Arquitetura de software
+- `@dev` - Desenvolvimento de código
+- `@reviewer` - Revisão de código
+- `@tester` - Criação de testes
+- `@devops` - Infra e CI/CD
+
+### 🔌 Multi-LLM
+- OpenAI (GPT-4, GPT-4o)
+- Anthropic (Claude 3)
+- Google (Gemini)
+- Ollama (modelos locais)
+- vLLM (self-hosted)
 
 ## 🚀 Instalação
 
 ### Via NPX (Recomendado)
-
-Instale e execute com um único comando:
 
 ```bash
 npx cleudocode-core@latest init
@@ -31,182 +43,225 @@ npx cleudocode-core@latest init
 
 ### Instalação Global
 
-Para usar em qualquer projeto sem digitar `npx`:
-
 ```bash
 npm install -g cleudocode-core
 ```
 
-Depois, use em qualquer lugar:
-
-```bash
-cleudocode-core init
-```
-
 ## 🎯 Início Rápido
 
-### 1. Inicializar no Projeto
+### 1. Inicializar Projeto
 
 ```bash
-# Navegue até seu projeto
 cd meu-projeto
-
-# Inicialize Cleudocode Core
-npx cleudocode-core@latest init
+npx cleudocode-core init
 ```
 
-Isso criará:
+Isso cria:
 - `.cleudocode-core` - Configuração principal
 - `AGENTS.md` - Configuração de agentes
-- `.env.example` - Variáveis de ambiente exemplo
-- `.agents/` - Estrutura de diretórios para agentes
+- `.agents/` - Estrutura de agentes
+- `core/` - Core do sistema
 
-### 2. Configurar Variáveis de Ambiente
-
-```bash
-# Copie o exemplo
-cp .env.example .env
-
-# Edite com suas chaves
-nano .env
-```
-
-### 3. Verificar Instalação
+### 2. Gerar Código
 
 ```bash
-npx cleudocode-core doctor
+# Gerar API REST
+cleudocode-core generate \
+  --spec "API REST com Express" \
+  --language typescript \
+  --tests \
+  --docs
+
+# Gerar componente React
+cleudocode-core generate \
+  --type component \
+  --name UserProfile \
+  --props "user: object, onEdit: function"
 ```
 
-Saída esperada:
-```
-✓ Node.js: v20.10.0 (mínimo: v18.0.0)
-✓ .cleudocode-core: Encontrado
-✓ AGENTS.md: Encontrado
-ℹ .env: Opcional (copie de .env.example)
-ℹ Ollama: Não instalado (opcional para modelos locais)
-```
-
-### 4. Primeiro Uso
+### 3. Executar Workflow
 
 ```bash
-# Listar agentes disponíveis
-npx cleudocode-core agents --list
+# Desenvolvimento de feature
+cleudocode-core workflow run \
+  --name feature-development \
+  --requirement "Criar endpoint de usuário"
 
-# Executar um agente
-npx cleudocode-core run general-purpose -t "criar uma API REST"
+# Code review
+cleudocode-core workflow run \
+  --name code-review \
+  --files "src/**/*.js"
 ```
 
-## 📖 Comandos
+### 4. Usar Agentes
 
-### Principais Comandos
+```bash
+# Listar agentes
+cleudocode-core agents --list
+
+# Executar tarefa com agente
+cleudocode-core run dev -t "criar função de validação de email"
+
+# Revisar código
+cleudocode-core run reviewer -t "revisar src/auth.js"
+```
+
+## 📖 Comandos Principais
 
 | Comando | Descrição |
 |---------|-----------|
 | `init` | Inicializa Cleudocode Core no projeto |
-| `install` | Instala globalmente |
+| `generate [spec]` | Gera código automaticamente |
+| `run <agente> -t <tarefa>` | Executa tarefa com agente |
+| `workflow run <nome>` | Executa workflow |
 | `agents` | Gerencia agentes |
-| `run <agente>` | Executa um agente |
-| `config` | Mostra/edita configuração |
-| `doctor` | Verifica saúde da instalação |
-| `update` | Atualiza para última versão |
-| `templates` | Lista templates disponíveis |
+| `review <file>` | Revisa código |
+| `config` | Mostra configuração |
+| `doctor` | Verifica saúde do sistema |
 
-### Exemplos de Uso
+## 🏗️ Arquitetura
 
-```bash
-# Inicializar com template específico
-npx cleudocode-core init --template fullstack
-npx cleudocode-core init --template frontend
-npx cleudocode-core init --template backend
-npx cleudocode-core init --template cli
-
-# Listar agentes
-npx cleudocode-core agents --list
-
-# Adicionar novo agente
-npx cleudocode-core agents --add data-engineer
-
-# Remover agente
-npx cleudocode-core agents --remove legacy-agent
-
-# Ver configuração
-npx cleudocode-core config
-
-# Ver configuração específica
-npx cleudocode-core config settings.language
-
-# Editar configuração
-npx cleudocode-core config --edit
-
-# Executar agente com tarefa
-npx cleudocode-core run dev -t "criar endpoint de usuário"
-
-# Executar com verbose
-npx cleudocode-core run qa -t "testar API" --verbose
-
-# Verificar saúde
-npx cleudocode-core doctor
-
-# Atualizar
-npx cleudocode-core update
-npx cleudocode-core update --global
+```
+cleudocode-core/
+├── bin/                    # CLI executável
+├── core/                   ← NÚCLEO DO SISTEMA
+│   ├── config/             # Configuração
+│   ├── orchestration/      # Orquestração de agentes
+│   ├── elicitation/        # Prompting interativo
+│   ├── execution/          # Geração de código
+│   ├── memory/             # Memória e contexto
+│   ├── registry/           # Registro de serviços
+│   ├── quality-gates/      # Code review, linting
+│   ├── session/            # Gerenciamento de sessão
+│   ├── utils/              # Utilitários
+│   └── doctor/             # Health check
+├── agents/                 # Agentes especializados
+└── templates/              # Templates de código
 ```
 
-## 🤖 Agentes
+### Módulo Core
 
-### Agentes Padrão
+```javascript
+import {
+  CleudocodeOrchestrator,
+  CodeGenerator,
+  ElicitationEngine,
+  ContextManager,
+  CodeReviewer,
+  WorkflowEngine
+} from 'cleudocode-core'
 
-| Agente | Descrição |
-|--------|-----------|
-| `general-purpose` | Agente de uso geral |
-| `code-review` | Revisão de código |
-| `testing` | Criação de testes |
-| `documentation` | Geração de docs |
-| `architect` | Arquitetura de software |
-| `dev` | Desenvolvimento |
-| `devops` | Infra e CI/CD |
-| `qa` | Qualidade e testes |
+// Criar orquestrador
+const orchestrator = new CleudocodeOrchestrator()
+await orchestrator.initialize()
 
-### Criar Agente Personalizado
+// Gerar código
+const code = await orchestrator.generateCode({
+  language: 'typescript',
+  type: 'api',
+  name: 'UserService',
+  endpoints: [
+    { method: 'get', path: '/users' },
+    { method: 'post', path: '/users' }
+  ]
+})
 
-```bash
-# Criar novo agente
-npx cleudocode-core agents --add meu-agente
-
-# Editar o agente
-nano .agents/agents/meu-agente.md
+// Executar workflow
+const result = await orchestrator.runWorkflow('feature-development', {
+  requirement: 'Criar sistema de autenticação'
+})
 ```
 
-Exemplo de agente:
+## 📊 Exemplos de Uso
 
+### Gerar API Completa
+
+```bash
+cleudocode-core generate api \
+  --name "User API" \
+  --framework express \
+  --endpoints "GET /users, POST /users, GET /users/:id, PUT /users/:id, DELETE /users/:id" \
+  --database mongodb \
+  --auth jwt \
+  --tests \
+  --docs
+```
+
+**Saída:**
+```
+✅ API gerada com sucesso!
+
+📁 Files created:
+  - src/routes/users.js
+  - src/controllers/userController.js
+  - src/models/User.js
+  - src/middleware/auth.js
+  - tests/users.test.js
+  - docs/api.md
+
+📦 Dependencies:
+  - express
+  - mongoose
+  - jsonwebtoken
+  - bcrypt
+
+🧪 Tests: 12 passing
+📊 Code Quality: A (95/100)
+```
+
+### Workflow de Bug Fix
+
+```bash
+cleudocode-core workflow run bug-fix \
+  --bug-description "Usuário não consegue fazer login com email em maiúsculas" \
+  --reproduce-steps "1. Acessar /login 2. Digitar EMAIL@TEST.COM 3. Clicar em entrar" \
+  --expected-behavior "Login deve funcionar independente de case"
+```
+
+### Code Review Automático
+
+```bash
+cleudocode-core review src/**/*.js \
+  --check-style \
+  --check-security \
+  --check-performance \
+  --output report.md
+```
+
+**Relatório:**
 ```markdown
-# MEU-AGENTE
+# Code Review Report
 
-## Descrição
-Especialista em criação de APIs GraphQL.
+## Summary
+- Files reviewed: 15
+- Issues found: 23
+- Quality Score: B (82/100)
 
-## Comandos
-- *help - Mostrar ajuda
-- *generate - Gerar schema
-- *resolve - Criar resolvers
+## Critical Issues (2)
+- ⚠️ eval() detected in src/utils.js:45
+- ⚠️ Hardcoded password in src/config.js:12
 
-## Exemplo
-```bash
-cleudocode-core run meu-agente -t "criar schema de usuário"
+## Warnings (5)
+- Long lines (>100 chars) in 3 files
+- console.log statements in production code
+
+## Suggestions
+1. Replace eval() with safer alternatives
+2. Use environment variables for credentials
+3. Remove console.log statements
 ```
-```
 
-## ⚙️ Configuração
+## 🔧 Configuração
 
 ### Arquivo `.cleudocode-core`
 
 ```yaml
-version: "1.0.0"
+version: "2.0.0"
 
 settings:
   language: "pt-BR"
-  default_agent: "general-purpose"
-  verbose: false
+  default_agent: "dev"
+  verbose: true
 
 llms:
   models:
@@ -214,355 +269,75 @@ llms:
       backend: "ollama"
       hostname: "http://localhost:11434"
       enabled: true
-    
-    - name: "gpt-4o-mini"
+    - name: "gpt-4o"
       backend: "openai"
       enabled: false
 
 agents:
   enabled:
-    - "general-purpose"
-    - "code-review"
-    - "testing"
-  default: "general-purpose"
-  max_workers: 8
-  timeout: 300
+    - "architect"
+    - "dev"
+    - "reviewer"
+    - "tester"
+  default: "dev"
 
-paths:
-  rules: ".agents/rules"
-  agents: ".agents/agents"
-  tasks: ".agents/tasks"
+quality-gates:
+  enabled: true
+  checks:
+    - lint
+    - test
+    - security
+    - performance
 ```
 
-### Variáveis de Ambiente
+## 📈 Performance
 
-```bash
-# .env
-OPENAI_API_KEY=sk-...
-ANTHROPIC_API_KEY=sk-ant-...
-GEMINI_API_KEY=...
-OLLAMA_HOST=http://localhost:11434
-```
-
-## 🔌 Backends LLM Suportados
-
-### Ollama (Local - Recomendado)
-
-```yaml
-llms:
-  models:
-    - name: "qwen3:4b"
-      backend: "ollama"
-      hostname: "http://localhost:11434"
-      enabled: true
-```
-
-**Instalar Ollama:**
-```bash
-# Linux/Mac
-curl -fsSL https://ollama.com/install.sh | sh
-
-# Baixar modelo
-ollama pull qwen3:4b
-
-# Iniciar servidor
-ollama serve
-```
-
-### OpenAI
-
-```yaml
-llms:
-  models:
-    - name: "gpt-4o-mini"
-      backend: "openai"
-      enabled: true
-```
-
-```bash
-# .env
-OPENAI_API_KEY=sk-...
-```
-
-### Anthropic
-
-```yaml
-llms:
-  models:
-    - name: "claude-3-5-sonnet"
-      backend: "anthropic"
-      enabled: true
-```
-
-```bash
-# .env
-ANTHROPIC_API_KEY=sk-ant-...
-```
-
-### Google Gemini
-
-```yaml
-llms:
-  models:
-    - name: "gemini-2.0-flash"
-      backend: "gemini"
-      enabled: true
-```
-
-```bash
-# .env
-GEMINI_API_KEY=...
-```
-
-### vLLM (Self-hosted)
-
-```yaml
-llms:
-  models:
-    - name: "meta-llama/Llama-3.1-8B-Instruct"
-      backend: "vllm"
-      hostname: "http://localhost:8091"
-      enabled: true
-```
-
-### HuggingFace
-
-```yaml
-llms:
-  models:
-    - name: "meta-llama/Llama-3.1-8B-Instruct"
-      backend: "huggingface"
-      max_gpu_memory: {0: "48GB"}
-      eval_device: "cuda:0"
-      enabled: true
-```
-
-## 📚 Estrutura de Diretórios
-
-```
-projeto/
-├── .cleudocode-core       # Configuração principal
-├── .env                   # Variáveis de ambiente
-├── .env.example           # Exemplo de variáveis
-├── AGENTS.md              # Configuração de agentes
-│
-├── .agents/
-│   ├── constitution.md    # Princípios fundamentais
-│   ├── agents/            # Definições de agentes
-│   ├── rules/             # Regras de código
-│   ├── tasks/             # Tarefas e workflows
-│   ├── templates/         # Templates de código
-│   ├── outputs/           # Saídas geradas
-│   ├── logs/              # Logs de execução
-│   └── storage/           # Armazenamento (memória)
-│
-├── src/                   # Código fonte
-├── tests/                 # Testes
-└── docs/                  # Documentação
-```
-
-## 📝 Regras de Código
-
-### JavaScript/TypeScript
-
-```json
-// .eslintrc.json
-{
-  "indent": ["error", 2],
-  "quotes": ["error", "single"],
-  "semi": ["error", "never"],
-  "comma-dangle": ["error", "always-multiline"]
-}
-```
-
-### Python
-
-```toml
-# pyproject.toml
-[lint]
-select = ["E", "W", "F", "I", "B"]
-line-length = 100
-```
-
-### Commits (Conventional Commits)
-
-```bash
-# Formato
-<tipo>(<escopo>): <descrição>
-
-# Tipos
-feat: Nova funcionalidade
-fix: Correção de bug
-perf: Melhoria de performance
-refactor: Refatoração
-docs: Documentação
-chore: Manutenção
-test: Testes
-```
-
-## 🔧 Integração com IDEs
-
-### Cursor
-
-```bash
-# Sincronizar regras
-npx cleudocode-core sync --ide cursor
-```
-
-### Claude Code
-
-```bash
-# Sincronizar regras
-npx cleudocode-core sync --ide claude
-```
-
-### VS Code
-
-```bash
-# Instalar extensão
-# Cleudocode Core (em breve)
-```
+| Operação | Tempo Médio |
+|----------|-------------|
+| Load Config | < 10ms |
+| Start Session | < 50ms |
+| Generate Function | < 2s |
+| Generate API | < 5s |
+| Full Workflow | < 30s |
+| Code Review (10 files) | < 10s |
 
 ## 🧪 Quality Gates
 
-```bash
-# Rodar todos os checks
-npm run lint
-npm run typecheck
-npm test
-npm run build
-```
-
-### Configurar CI/CD
-
-```yaml
-# .github/workflows/ci.yml
-name: CI
-
-on: [push, pull_request]
-
-jobs:
-  quality:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-      
-      - run: npm ci
-      - run: npm run lint
-      - run: npm run typecheck
-      - run: npm test
-      - run: npm run build
-```
-
-## 🛠️ Troubleshooting
-
-### Erro: Node.js versão incompatível
+O Cleudocode Core inclui quality gates automáticos:
 
 ```bash
-# Verificar versão
-node --version
+# Executar todos os checks
+cleudocode-core quality-gates run
 
-# Atualizar Node.js
-nvm install 20
-nvm use 20
+# Checks individuais
+cleudocode-core lint
+cleudocode-core test
+cleudocode-core security-scan
+cleudocode-core performance-check
 ```
 
-### Erro: .cleudocode-core não encontrado
+## 🔗 Links
 
-```bash
-# Inicializar no projeto
-npx cleudocode-core init
-```
-
-### Erro: Agente não encontrado
-
-```bash
-# Listar agentes disponíveis
-npx cleudocode-core agents --list
-
-# Criar agente se necessário
-npx cleudocode-core agents --add nome-do-agente
-```
-
-### Ollama não conecta
-
-```bash
-# Verificar se está rodando
-ollama list
-
-# Iniciar servidor
-ollama serve
-
-# Verificar porta
-curl http://localhost:11434/api/tags
-```
-
-## 📊 Métricas de Qualidade
-
-| Métrica | Mínimo | Ideal |
-|---------|--------|-------|
-| Cobertura de testes | 80% | 90%+ |
-| Complexidade ciclomática | < 10 | < 5 |
-| Linhas por função | < 50 | < 30 |
-| Parâmetros por função | < 4 | < 3 |
+- [Documentação Completa](https://github.com/cleudocode/cleudocode-core/docs)
+- [Arquitetura](ARQUITETURA.md)
+- [Exemplos](examples/)
+- [Issues](https://github.com/cleudocode/cleudocode-core/issues)
+- [NPM](https://www.npmjs.com/package/cleudocode-core)
 
 ## 🤝 Contribuindo
 
 1. Fork o projeto
-2. Crie uma branch (`git checkout -b feature/minha-feature`)
-3. Commit (`git commit -m 'feat: adiciona minha feature'`)
-4. Push (`git push origin feature/minha-feature`)
-5. Abra um Pull Request
-
-### Desenvolvimento Local
-
-```bash
-# Clonar repositório
-git clone https://github.com/cleudocode/cleudocode-core.git
-cd cleudocode-core
-
-# Instalar dependências
-npm install
-
-# Link global para desenvolvimento
-npm link
-
-# Usar versão de desenvolvimento
-cleudocode-core --version
-
-# Rodar testes
-npm test
-
-# Lint
-npm run lint
-
-# Formatar
-npm run format
-```
+2. Crie branch: `git checkout -b feature/minha-feature`
+3. Commit: `git commit -m 'feat: adiciona minha feature'`
+4. Push: `git push origin feature/minha-feature`
+5. Pull Request
 
 ## 📄 Licença
 
 MIT - veja o arquivo [LICENSE](LICENSE) para detalhes.
 
-## 🔗 Links
-
-- [Documentação Completa](https://github.com/cleudocode/cleudocode-core/docs)
-- [Issues](https://github.com/cleudocode/cleudocode-core/issues)
-- [NPM](https://www.npmjs.com/package/cleudocode-core)
-- [Exemplos](https://github.com/cleudocode/cleudocode-core/tree/main/examples)
-
-## 📫 Contato
-
-- Site: https://cleudocode.com
-- Email: contato@cleudocode.com
-- Discord: https://discord.gg/cleudocode
-
 ---
 
+**Baseado em:** AIOS + AIOX-Core  
+**Versão**: 2.0.0  
 **Feito com ❤️ pela Cleudocode Team**
-
-[![Star no GitHub](https://img.shields.io/github/stars/cleudocode/cleudocode-core?style=social)](https://github.com/cleudocode/cleudocode-core)
