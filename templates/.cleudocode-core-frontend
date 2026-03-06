@@ -1,0 +1,70 @@
+# Cleudocode Core Configuration
+# Template: frontend
+# Focado em desenvolvimento frontend (React, Vue, Angular, etc.)
+
+version: "1.0.0"
+name: "cleudocode-core-frontend"
+
+settings:
+  language: "pt-BR"
+  default_agent: "frontend-dev"
+  verbose: false
+  log_mode: "console"
+
+llms:
+  models:
+    - name: "qwen3:4b"
+      backend: "ollama"
+      hostname: "http://localhost:11434"
+      enabled: true
+    - name: "gpt-4o-mini"
+      backend: "openai"
+      enabled: false
+
+agents:
+  enabled:
+    - "frontend-dev"
+    - "ui-review"
+    - "accessibility"
+    - "testing"
+  default: "frontend-dev"
+  max_workers: 4
+
+rules:
+  javascript:
+    indentation: "space"
+    indent_size: 2
+    quote_style: "single"
+    semicolons: false
+    jsx: true
+  
+  naming:
+    files: "kebab-case"
+    components: "PascalCase"
+    functions: "camelCase"
+  
+  commits:
+    style: "conventional"
+
+paths:
+  rules: ".agents/rules"
+  agents: ".agents/agents"
+  templates: ".agents/templates/components"
+
+features:
+  code_generation: true
+  auto_documentation: true
+  testing: true
+  accessibility_check: true
+
+memory:
+  type: "vector"
+  storage: "chroma"
+
+excludes:
+  - "node_modules"
+  - "dist"
+  - "build"
+  - ".next"
+  - "out"
+  - ".cache"

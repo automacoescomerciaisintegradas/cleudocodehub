@@ -1,0 +1,213 @@
+# Cleudocode Core Configuration
+# Template: fullstack
+# Gerado automaticamente pelo Cleudocode Core CLI
+
+version: "1.0.0"
+name: "cleudocode-core"
+description: "Cleudocode Hub - AI Orchestration Framework"
+
+# =============================================================================
+# CONFIGURAÇÕES GERAIS
+# =============================================================================
+settings:
+  language: "pt-BR"
+  default_agent: "general-purpose"
+  auto_save: true
+  verbose: false
+  log_mode: "console"
+  environment: "development"
+
+# =============================================================================
+# CHAVES DE API (use variáveis de ambiente)
+# =============================================================================
+api_keys:
+  openai: "${OPENAI_API_KEY}"
+  gemini: "${GEMINI_API_KEY}"
+  groq: "${GROQ_API_KEY}"
+  anthropic: "${ANTHROPIC_API_KEY}"
+  huggingface:
+    auth_token: "${HF_AUTH_TOKEN}"
+
+# =============================================================================
+# CONFIGURAÇÃO DE LLMs
+# =============================================================================
+llms:
+  models:
+    # Ollama Models (padrão - local)
+    - name: "qwen3:4b"
+      backend: "ollama"
+      hostname: "http://localhost:11434"
+      enabled: true
+    - name: "qwen3:1.7b"
+      backend: "ollama"
+      hostname: "http://localhost:11434"
+      enabled: true
+    
+    # OpenAI Models
+    - name: "gpt-4o-mini"
+      backend: "openai"
+      enabled: false
+    - name: "gpt-4o"
+      backend: "openai"
+      enabled: false
+    
+    # Anthropic Models
+    - name: "claude-3-5-sonnet"
+      backend: "anthropic"
+      enabled: false
+    
+    # Google Models
+    - name: "gemini-2.0-flash"
+      backend: "gemini"
+      enabled: false
+
+  router:
+    strategy: "sequential"
+    log_mode: "console"
+    use_context_manager: false
+
+# =============================================================================
+# CONFIGURAÇÃO DE AGENTES
+# =============================================================================
+agents:
+  enabled:
+    - "general-purpose"
+    - "code-review"
+    - "documentation"
+    - "testing"
+    - "architect"
+    - "dev"
+    - "devops"
+    - "qa"
+  
+  default: "general-purpose"
+  max_workers: 8
+  timeout: 300
+  
+  shortcuts:
+    "@architect": ".agents/agents/architect.md"
+    "@dev": ".agents/agents/dev.md"
+    "@devops": ".agents/agents/devops.md"
+    "@qa": ".agents/agents/qa.md"
+    "@analyst": ".agents/agents/analyst.md"
+
+# =============================================================================
+# REGRAS DE CÓDIGO
+# =============================================================================
+rules:
+  javascript:
+    indentation: "space"
+    indent_size: 2
+    quote_style: "single"
+    semicolons: false
+    trailing_comma: "es5"
+    line_length: 100
+  
+  python:
+    indentation: "space"
+    indent_size: 4
+    quote_style: "single"
+    line_length: 100
+    type_hints: true
+  
+  naming:
+    files: "kebab-case"
+    functions: "camelCase"
+    classes: "PascalCase"
+    constants: "UPPER_SNAKE_CASE"
+  
+  commits:
+    style: "conventional"
+    signoff: false
+    max_subject_length: 72
+
+# =============================================================================
+# INTEGRAÇÕES
+# =============================================================================
+integrations:
+  git:
+    enabled: true
+    auto_stage: false
+    auto_commit: false
+  
+  github:
+    enabled: false
+    auto_pr: false
+
+# =============================================================================
+# CAMINHOS
+# =============================================================================
+paths:
+  rules: ".agents/rules"
+  agents: ".agents/agents"
+  templates: ".agents/templates"
+  tasks: ".agents/tasks"
+  outputs: ".agents/outputs"
+  logs: ".agents/logs"
+  storage: ".agents/storage"
+
+# =============================================================================
+# RECURSOS
+# =============================================================================
+features:
+  task_delegation: true
+  code_generation: true
+  auto_documentation: true
+  testing: true
+  linting: true
+  context_manager: false
+  memory_persistence: true
+
+# =============================================================================
+# MEMÓRIA
+# =============================================================================
+memory:
+  type: "vector"
+  storage: "chroma"
+  collection_name: "cleudocode_memory"
+  context:
+    max_length: 4096
+    truncation_strategy: "oldest_first"
+    compression:
+      enabled: true
+      threshold: 0.8
+
+# =============================================================================
+# ARMAZENAMENTO
+# =============================================================================
+storage:
+  type: "local"
+  root_dir: ".agents/storage"
+  use_vector_db: true
+  vector_db_backend: "chroma"
+
+# =============================================================================
+# LOGGING
+# =============================================================================
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  log_mode: "console"
+
+# =============================================================================
+# EXCLUSÕES
+# =============================================================================
+excludes:
+  - "node_modules"
+  - "dist"
+  - "build"
+  - ".git"
+  - "*.min.js"
+  - "*.min.css"
+  - "coverage"
+  - ".cache"
+  - "__pycache__"
+  - "*.pyc"
+
+# =============================================================================
+# HOOKS
+# =============================================================================
+hooks:
+  pre_task: null
+  post_task: null
+  on_error: "log"

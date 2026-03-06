@@ -1,0 +1,497 @@
+# Cleudocode Core Configuration
+# Configuração central do Cleudocode Hub para orquestração de agentes AI
+# Baseado em: AIOS, AIOX-Core, BMAD-METHOD
+
+version: "1.0.0"
+name: "cleudocode-core"
+description: "Cleudocode Hub - AI Orchestration Framework"
+
+# =============================================================================
+# CONFIGURAÇÕES GERAIS
+# =============================================================================
+settings:
+  language: "pt-BR"
+  default_agent: "general-purpose"
+  auto_save: true
+  verbose: false
+  log_mode: "console"  # console | file
+  environment: "development"  # development | production
+
+# =============================================================================
+# CHAVES DE API (use variáveis de ambiente em produção)
+# =============================================================================
+api_keys:
+  openai: "${OPENAI_API_KEY}"
+  gemini: "${GEMINI_API_KEY}"
+  groq: "${GROQ_API_KEY}"
+  anthropic: "${ANTHROPIC_API_KEY}"
+  huggingface:
+    auth_token: "${HF_AUTH_TOKEN}"
+    cache_dir: "${HF_CACHE_DIR}"
+
+# =============================================================================
+# CONFIGURAÇÃO DE LLMs
+# =============================================================================
+llms:
+  models:
+    # OpenAI Models
+    - name: "gpt-4o-mini"
+      backend: "openai"
+      enabled: false
+    - name: "gpt-4o"
+      backend: "openai"
+      enabled: false
+    
+    # Google Models
+    - name: "gemini-2.0-flash"
+      backend: "gemini"
+      enabled: false
+    
+    # Anthropic Models
+    - name: "claude-3-5-sonnet"
+      backend: "anthropic"
+      enabled: false
+    
+    # Ollama Models (padrão)
+    - name: "qwen3:4b"
+      backend: "ollama"
+      hostname: "http://localhost:11434"
+      enabled: true
+    - name: "qwen3:1.7b"
+      backend: "ollama"
+      hostname: "http://localhost:11434"
+      enabled: true
+    
+    # HuggingFace Models
+    - name: "meta-llama/Llama-3.1-8B-Instruct"
+      backend: "huggingface"
+      max_gpu_memory: {0: "48GB"}
+      eval_device: "cuda:0"
+      enabled: false
+    
+    # vLLM Models
+    - name: "meta-llama/Llama-3.1-8B-Instruct"
+      backend: "vllm"
+      hostname: "http://localhost:8091"
+      enabled: false
+
+  router:
+    strategy: "sequential"  # sequential | round_robin | load_balanced
+    bootstrap_url: ""
+    log_mode: "console"
+    use_context_manager: false
+
+# =============================================================================
+# CONFIGURAÇÃO DE AGENTES
+# =============================================================================
+agents:
+  enabled:
+    - "general-purpose"
+    - "code-review"
+    - "documentation"
+    - "testing"
+    - "architect"
+    - "dev"
+    - "devops"
+    - "qa"
+  
+  default: "general-purpose"
+  
+  max_workers: 8
+  timeout: 300
+  
+  # Atalhos de ativação (similar ao AIOX-Core)
+  shortcuts:
+    "@architect": ".agents/agents/architect.md"
+    "@dev": ".agents/agents/dev.md"
+    "@devops": ".agents/agents/devops.md"
+    "@qa": ".agents/agents/qa.md"
+    "@analyst": ".agents/agents/analyst.md"
+    "@pm": ".agents/agents/pm.md"
+    "@po": ".agents/agents/po.md"
+    "@sm": ".agents/agents/sm.md"
+    "@ux": ".agents/agents/ux-designer.md"
+
+# =============================================================================
+# REGRAS DE CÓDIGO E ESTILO
+# =============================================================================
+rules:
+  # JavaScript/TypeScript
+  javascript:
+    indentation: "space"
+    indent_size: 2
+    quote_style: "single"
+    semicolons: false
+    trailing_comma: "es5"
+    line_length: 100
+    arrow_parens: "avoid"
+    bracket_spacing: true
+  
+  # Python
+  python:
+    indentation: "space"
+    indent_size: 4
+    quote_style: "single"
+    line_length: 100
+    type_hints: true  # obrigatório em funções públicas
+    max_line_length: 100
+  
+  # Naming conventions
+  naming:
+    files: "kebab-case"           # my-file.js, my-module.py
+    functions: "camelCase"        # myFunction, process_data
+    methods: "camelCase"          # myMethod
+    classes: "PascalCase"         # MyClass, DataProcessor
+    constants: "UPPER_SNAKE_CASE" # MAX_SIZE, API_KEY
+    components: "PascalCase"      # MyComponent, UserProfile
+    variables: "camelCase"        # myVariable, user_count
+  
+  # Commits (Conventional Commits)
+  commits:
+    style: "conventional"
+    signoff: false
+    max_subject_length: 72
+    max_body_length: 100
+    require_scope: false
+    types:
+      feat: "Nova funcionalidade"
+      fix: "Correção de bug"
+      perf: "Melhoria de performance"
+      revert: "Reversão de commit"
+      docs: "Mudança em documentação"
+      chore: "Tarefas de manutenção"
+      refactor: "Refatoração de código"
+      test: "Adição/modificação de testes"
+      ci: "Mudanças em CI/CD"
+      style: "Formatação/código visual"
+  
+  # Quality gates
+  quality_gates:
+    enabled: true
+    checks:
+      - name: "lint"
+        command: "npm run lint"
+        required: true
+      - name: "typecheck"
+        command: "npm run typecheck"
+        required: true
+      - name: "test"
+        command: "npm test"
+        required: true
+      - name: "build"
+        command: "npm run build"
+        required: false
+    
+    # Métricas mínimas
+    metrics:
+      test_coverage_min: 80
+      max_complexity: 10
+      max_lines_per_function: 50
+      max_params_per_function: 4
+  
+  # Code review
+  code_review:
+    required: true
+    min_approvals: 1
+    require_resolving_comments: true
+    auto_request_review: true
+    checklist:
+      - "Código segue estilo do projeto"
+      - "Testes adicionados/atualizados"
+      - "Documentação atualizada"
+      - "Sem console.log/debug deixado"
+      - "Commits com mensagens claras"
+      - "Branch atualizada com main"
+  
+  # Segurança
+  security:
+    scan_secrets: true
+    scan_dependencies: true
+    deny_patterns:
+      - "api_key"
+      - "api_secret"
+      - "password"
+      - "token"
+      - "credential"
+      - "private_key"
+
+# =============================================================================
+# INTEGRAÇÕES
+# =============================================================================
+integrations:
+  git:
+    enabled: true
+    auto_stage: false
+    auto_commit: false
+    gpg_sign: false
+  
+  github:
+    enabled: false
+    auto_pr: false
+    auto_review: true
+  
+  gitlab:
+    enabled: false
+  
+  bitbucket:
+    enabled: false
+
+# =============================================================================
+# CAMINHOS
+# =============================================================================
+paths:
+  rules: ".agents/rules"
+  agents: ".agents/agents"
+  templates: ".agents/templates"
+  workflows: ".agents/workflows"
+  tasks: ".agents/tasks"
+  outputs: ".agents/outputs"
+  logs: ".agents/logs"
+  storage: ".agents/storage"
+  constitution: ".agents/constitution.md"
+  agents_manifest: "AGENTS.md"
+
+# =============================================================================
+# RECURSOS HABILITADOS
+# =============================================================================
+features:
+  task_delegation: true
+  code_generation: true
+  auto_documentation: true
+  testing: true
+  linting: true
+  type_checking: true
+  context_manager: false
+  memory_persistence: true
+  vector_search: true
+  mcp_integration: false
+
+# =============================================================================
+# MEMÓRIA E CONTEXTO
+# =============================================================================
+memory:
+  log_mode: "console"
+  type: "vector"
+  storage: "chroma"  # chroma | qdrant
+  collection_name: "cleudocode_memory"
+  
+  context:
+    max_length: 4096
+    truncation_strategy: "oldest_first"  # oldest_first | newest_first | summarize
+    compression:
+      enabled: true
+      threshold: 0.8
+      method: "summary"  # summary | truncate | sliding_window
+  
+  session:
+    persistence: true
+    save_interval: 60  # segundos
+    max_sessions: 10
+
+# =============================================================================
+# ARMAZENAMENTO
+# =============================================================================
+storage:
+  type: "local"
+  root_dir: ".agents/storage"
+  use_vector_db: true
+  vector_db_backend: "chroma"  # chroma | qdrant
+  
+  # Configuração Qdrant (se usar qdrant)
+  qdrant:
+    host: "localhost"
+    port: 6333
+    api_key: "${QDRANT_API_KEY}"
+    model_name: "sentence-transformers/all-MiniLM-L6-v2"
+
+# =============================================================================
+# FERRAMENTAS
+# =============================================================================
+tools:
+  mcp:
+    enabled: false
+    server_script: ".agents/tools/mcp_server.py"
+  
+  shell:
+    enabled: true
+    allowed_commands:
+      - "git"
+      - "npm"
+      - "yarn"
+      - "pnpm"
+      - "bun"
+      - "docker"
+      - "node"
+      - "python"
+      - "bash"
+    denied_commands:
+      - "rm -rf /"
+      - "sudo"
+      - "chmod -R 777"
+
+# =============================================================================
+# SCHEDULER
+# =============================================================================
+scheduler:
+  log_mode: "console"
+  max_workers: 8
+  queue_size: 100
+  timeout: 300
+  retry_attempts: 3
+  retry_delay: 1000  # ms
+
+# =============================================================================
+# LOGGING
+# =============================================================================
+logging:
+  level: "INFO"  # DEBUG | INFO | WARNING | ERROR | CRITICAL
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  log_mode: "console"  # console | file
+  file_path: ".agents/logs/cleudocode.log"
+  max_file_size: "10MB"
+  backup_count: 5
+
+# =============================================================================
+# SERVIDOR (para API/CLI remoto)
+# =============================================================================
+server:
+  enabled: false
+  host: "localhost"
+  port: 8000
+  cors_enabled: true
+  allowed_origins:
+    - "http://localhost:3000"
+    - "http://localhost:8080"
+
+# =============================================================================
+# ARQUIVOS E PASTAS IGNORADOS
+# =============================================================================
+excludes:
+  # Dependências
+  - "node_modules"
+  - "vendor"
+  - ".venv"
+  - "venv"
+  - "__pycache__"
+  
+  # Build/Dist
+  - "dist"
+  - "build"
+  - "out"
+  - "target"
+  
+  # Git
+  - ".git"
+  - ".svn"
+  - ".hg"
+  
+  # IDE
+  - ".idea"
+  - ".vscode"
+  - "*.swp"
+  - "*.swo"
+  
+  # Logs e cache
+  - "logs"
+  - "*.log"
+  - ".cache"
+  - ".npm"
+  - ".yarn"
+  
+  # Arquivos compilados/minificados
+  - "*.min.js"
+  - "*.min.css"
+  - "*.pyc"
+  - "*.pyo"
+  
+  # Testes
+  - "coverage"
+  - ".nyc_output"
+  
+  # Ambiente
+  - ".env"
+  - ".env.local"
+  - ".env.*.local"
+  
+  # OS
+  - ".DS_Store"
+  - "Thumbs.db"
+
+# =============================================================================
+# HOOKS DE EXECUÇÃO
+# =============================================================================
+hooks:
+  pre_task: null  # script ou comando executado antes de cada tarefa
+  post_task: null  # script ou comando executado após cada tarefa
+  on_error: "log"  # log | notify | halt
+  pre_commit: null
+  post_commit: null
+  on_agent_activate: null
+  on_agent_deactivate: null
+
+# =============================================================================
+# CONSTITUIÇÃO (similar ao AIOX-Core)
+# =============================================================================
+constitution:
+  principles:
+    - "CLI First"
+    - "Agent Authority"
+    - "Story-Driven Development"
+    - "No Invention"
+    - "Quality First"
+    - "Absolute Imports"
+  
+  workflow:
+    - "Start from story in docs/stories/"
+    - "Implement only what acceptance criteria require"
+    - "Update checklist and file list"
+    - "Run quality gates before completing"
+  
+  quality_gates:
+    - "npm run lint"
+    - "npm run typecheck"
+    - "npm test"
+
+# =============================================================================
+# WORKFLOWS PRÉ-DEFINIDOS
+# =============================================================================
+workflows:
+  code_review:
+    steps:
+      - "analyze_changes"
+      - "check_style"
+      - "run_tests"
+      - "security_scan"
+      - "generate_report"
+  
+  feature_development:
+    steps:
+      - "understand_requirements"
+      - "design_solution"
+      - "implement_code"
+      - "write_tests"
+      - "update_docs"
+  
+  bug_fix:
+    steps:
+      - "reproduce_bug"
+      - "identify_root_cause"
+      - "implement_fix"
+      - "verify_fix"
+      - "add_regression_test"
+
+# =============================================================================
+# PERSONALIZAÇÃO ESPECÍFICA DO PROJETO
+# =============================================================================
+project:
+  type: "fullstack"  # frontend | backend | fullstack | library | cli
+  framework: "auto-detect"
+  package_manager: "auto-detect"  # npm | yarn | pnpm | bun
+  
+  # Scripts personalizados
+  scripts:
+    build: "npm run build"
+    test: "npm test"
+    lint: "npm run lint"
+    typecheck: "npm run typecheck"
+    dev: "npm run dev"

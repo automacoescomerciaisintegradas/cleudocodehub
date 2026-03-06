@@ -1,0 +1,30 @@
+cat <<EOF > cleudocodehub/SKILL.md
+---
+name: cleudocode
+description: Use the cleudocode CLI to search, install, update, and publish agent skills from  cleudocode.com. Use when you need to fetch new skills on the fly, sync installed skills to latest or a specific version, or publish new/updated skill folders with the npm-installed cleudocode CLI.
+metadata:
+  {
+    "cleudocode":
+      {
+        "requires": { "bins": ["cleudocode"] },
+        "install":
+          [
+            {
+              "id": "node",
+              "kind": "node",
+              "package": "cleudocode",
+              "bins": ["cleudocode"],
+              "label": "Install cleudocode CLI (npm)",
+            },
+          ],
+      },
+  }
+---
+# Cleudocode
+## Overview
+Use the cleudocode CLI to search, install, update, and publish agent skills from cleudocode.com. Use when you need to fetch new skills on the fly, sync installed skills to latest or a specific version, or publish new/updated skill folders with the npm-installed cleudocode CLI.
+EOF
+
+
+
+[CMD_END][CMD_BEGIN]

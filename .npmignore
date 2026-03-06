@@ -1,0 +1,70 @@
+# NPM Ignore - Arquivos ignorados na publicação
+# https://docs.npmjs.com/misc/developers
+
+# Development
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Testing
+coverage/
+.nyc_output/
+test-results/
+tests/
+
+# Logs
+logs/
+*.log
+
+# Cache
+.cache/
+.eslintcache
+.ruff_cache/
+.mypy_cache/
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Documentation (mantemos apenas README.md e LICENSE)
+PUBLISH.md
+CONTRIBUTING.md
+CHANGELOG.md
+
+# Templates (usamos apenas os necessários)
+templates/eslintrc.json
+templates/prettierrc
+templates/gitignore
+
+# Configurações locais
+.env
+.env.local
+.env.*
+!.env.example
+
+# Build artifacts (se houver)
+dist/
+build/
+out/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+
+# Cleudocode outputs
+.agents/outputs/
+.agents/logs/
+.agents/storage/
