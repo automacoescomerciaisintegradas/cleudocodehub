@@ -1071,6 +1071,117 @@ program
   })
 
 // =============================================================================
+// COMANDO: marketplace - INTEGRAÇÃO COM SKILLS MARKETPLACE
+// =============================================================================
+program
+  .command('marketplace [acao] [nome]')
+  .description('🔌 Skills Marketplace - 160,566+ skills')
+  .option('-s, --search <query>', 'Buscar skills')
+  .option('-i, --install <skill>', 'Instalar skill')
+  .option('-l, --list', 'Listar skills')
+  .option('-c, --category <nome>', 'Listar por categoria')
+  .option('--enable <skill>', 'Ativar skill')
+  .option('--disable <skill>', 'Desativar skill')
+  .option('--stats', 'Estatísticas do marketplace')
+  .action(async (acao, nome, options) => {
+    p.intro(chalk.bgBlue.black(' SKILLS MARKETPLACE '))
+
+    console.log(chalk.blue.bold('\n🔌 Skills Marketplace Integration'))
+    console.log(chalk.blue('160,566+ skills disponíveis\n'))
+
+    try {
+      // Importar módulo Marketplace
+      const { SkillsMarketplaceIntegration } = await import(
+        join(__dirname, '../supercleudocode-plugin/lib/marketplace-integration.js')
+      )
+
+      const marketplace = new SkillsMarketplaceIntegration()
+      await marketplace.initialize()
+
+      if (options.search) {
+        const results = await marketplace.searchSkills(options.search)
+        console.log(chalk.blue(`\n🔍 Resultados para: "${options.search}"`))
+        results.skills.forEach(skill => {
+          console.log(chalk.green(`  ✓ ${skill.name} (${skill.category})`))
+        })
+        p.outro(chalk.green(`✅ ${results.total} skills encontradas`))
+        return
+      }
+
+      if (options.install) {
+        const result = await marketplace.installSkill(options.install)
+        if (result.success) {
+          p.outro(chalk.green('✅ Skill instalada!'))
+        } else {
+          p.outro(chalk.red('❌ Erro ao instalar'))
+        }
+        return
+      }
+
+      if (options.enable) {
+        await marketplace.toggleSkill(options.enable, true)
+        p.outro(chalk.green('✅ Skill ativada!'))
+        return
+      }
+
+      if (options.disable) {
+        await marketplace.toggleSkill(options.disable, false)
+        p.outro(chalk.green('✅ Skill desativada!'))
+        return
+      }
+
+      if (options.category) {
+        marketplace.listByCategory(options.category)
+        return
+      }
+
+      if (options.list || !acao) {
+        marketplace.listAll()
+        return
+      }
+
+      if (options.stats || acao === 'stats') {
+        const stats = marketplace.getStats()
+        console.log(chalk.bgBlue.black('\n MARKETPLACE STATS '))
+        console.log(chalk.blue(`\n📊 Skills: ${stats.totalSkills}`))
+        console.log(chalk.blue(`📦 Instaladas: ${stats.installedSkills}`))
+        console.log(chalk.blue(`📚 Knowledge: ${stats.knowledgeBase.docs} docs`))
+        console.log(chalk.blue(`🤖 Agentes: ${stats.agents}`))
+        console.log(chalk.blue(`🎯 Missões: ${stats.activeMissions}\n`))
+        p.outro(chalk.green('✅ Stats atualizados!'))
+        return
+      }
+
+      // Ações diretas
+      if (acao === 'search' && nome) {
+        const results = await marketplace.searchSkills(nome)
+        results.skills.forEach(s => console.log(chalk.green(`  ✓ ${s.name}`)))
+        return
+      }
+
+      if (acao === 'install' && nome) {
+        await marketplace.installSkill(nome)
+        return
+      }
+
+      if (acao === 'list') {
+        marketplace.listAll()
+        return
+      }
+
+      p.log.warn('Ação não especificada')
+      p.log.info('Use: cleudocode-core marketplace --list')
+      p.log.info('     cleudocode-core marketplace --search "query"')
+      p.log.info('     cleudocode-core marketplace --install skill-name')
+      p.log.info('     cleudocode-core marketplace --stats')
+
+    } catch (error) {
+      p.log.error(chalk.red(`Erro: ${error.message}`))
+      p.outro(chalk.red('❌ Erro no marketplace'))
+    }
+  })
+
+// =============================================================================
 // HELP PERSONALIZADO
 // =============================================================================
 program.addHelpText('after', `
@@ -1085,6 +1196,7 @@ ${chalk.bold('Exemplos:')}
   ${chalk.cyan('cleudocode-core super-skill --list')}    Lista Super-Skills
   ${chalk.cyan('cleudocode-core yolo "minha feature"')}  🚀 YOLO MODE
   ${chalk.cyan('cleudocode-core swarm "API REST"')}      🐝 SWARM DE AGENTES
+  ${chalk.cyan('cleudocode-core marketplace --list')}    🔌 MARKETPLACE DE SKILLS
 
 ${chalk.bold('SuperCleudocode Commands:')}
   ${chalk.cyan('super-skill [nome]')}       Ativa ou mostra skill
@@ -1097,6 +1209,14 @@ ${chalk.bold('SuperCleudocode Commands:')}
   ${chalk.cyan('super-init [projeto]')}     Inicializa projeto
   ${chalk.cyan('yolo [feature]')}           🚀 YOLO MODE - Desenvolvimento automático
   ${chalk.cyan('swarm [task]')}             🐝 SWARM - Agentes semânticos
+  ${chalk.cyan('marketplace [acao]')}       🔌 Skills Marketplace (160K+ skills)
+
+${chalk.bold('Marketplace Commands:')}
+  ${chalk.cyan('marketplace --list')}              Lista skills locais
+  ${chalk.cyan('marketplace --search "query"')}    Busca skills
+  ${chalk.cyan('marketplace --install skill')}     Instala skill
+  ${chalk.cyan('marketplace --stats')}             Estatísticas
+  ${chalk.cyan('marketplace --category name')}     Lista por categoria
 
 ${chalk.bold('Links:')}
   Documentação: https://github.com/cleudocode/cleudocode-core
@@ -1105,6 +1225,7 @@ ${chalk.bold('Links:')}
   SuperCleudocode: supercleudocode-plugin/README.md
   YOLO Mode: supercleudocode-plugin/lib/yolo-mode.js
   Semantic Swarm: supercleudocode-plugin/lib/semantic-swarm.js
+  Marketplace: supercleudocode-plugin/lib/marketplace-integration.js
 `)
 
 // =============================================================================
