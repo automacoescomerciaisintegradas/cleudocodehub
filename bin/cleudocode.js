@@ -447,19 +447,141 @@ program
   .description('Lista templates disponíveis')
   .action(async () => {
     const templatesDir = join(__dirname, '../templates')
-    
+
     if (!fs.existsSync(templatesDir)) {
       p.log.warn('Nenhum template encontrado')
       return
     }
 
     const templates = fs.readdirSync(templatesDir)
-    
+
     console.log(chalk.bold('\nTemplates disponíveis:\n'))
     templates.forEach(t => {
       console.log(`  ${chalk.cyan('•')} ${t}`)
     })
     console.log()
+  })
+
+// =============================================================================
+// COMANDO: plugin
+// =============================================================================
+program
+  .command('plugin <acao> [nome]')
+  .description('Gerencia plugins')
+  .option('-l, --list', 'Listar plugins instalados')
+  .action(async (acao, nome, options) => {
+    p.intro(chalk.bgGreen.black(` SuperCleudocode - Plugin ${acao} `))
+
+    const pluginsDir = join(PROJECT_ROOT, 'plugins')
+
+    if (acao === 'list' || options.list) {
+      if (!fs.existsSync(pluginsDir)) {
+        p.log.info('Nenhum plugin instalado')
+        return
+      }
+
+      const plugins = fs.readdirSync(pluginsDir)
+        .filter(p => fs.statSync(join(pluginsDir, p)).isDirectory())
+
+      if (plugins.length === 0) {
+        p.log.info('Nenhum plugin instalado')
+        return
+      }
+
+      console.log(chalk.bold('\nPlugins instalados:\n'))
+      plugins.forEach(plugin => {
+        console.log(`  ${chalk.cyan('•')} ${plugin}`)
+      })
+      console.log()
+      return
+    }
+
+    if (acao === 'install' && nome) {
+      const spinner = ora(`Instalando plugin ${nome}...`).start()
+      
+      try {
+        // Verificar se é o supercleudocode-plugin
+        if (nome === 'supercleudocode-plugin' || nome === 'supercleudocode') {
+          const pluginPath = join(PROJECT_ROOT, 'supercleudocode-plugin')
+          
+          if (!fs.existsSync(pluginPath)) {
+            spinner.fail('Plugin não encontrado localmente')
+            p.log.info('Execute a partir do diretório do cleudocodehub.skill')
+            return
+          }
+
+          // Criar symlink ou copiar
+          const targetPath = join(pluginsDir, 'supercleudocode-plugin')
+          
+          if (!fs.existsSync(pluginsDir)) {
+            fs.ensureDirSync(pluginsDir)
+          }
+
+          if (fs.existsSync(targetPath)) {
+            fs.removeSync(targetPath)
+          }
+
+          fs.symlinkSync(pluginPath, targetPath, 'dir')
+          
+          spinner.succeed('supercleudocode-plugin instalado!')
+          
+          p.log.info(`
+${chalk.bold('Comandos disponíveis:')}
+  cleudocode-core super-skill --list
+  cleudocode-core super-plan "minha feature"
+  cleudocode-core super-execute
+  cleudocode-core super-review
+  cleudocode-core super-test
+  cleudocode-core super-debug "problema"
+  cleudocode-core super-deploy staging
+
+${chalk.bold('Skills disponíveis:')}
+  @brainstorming
+  @test-driven-development
+  @systematic-debugging
+  @writing-plans
+  @using-supercleudocode
+
+${chalk.bold('Próximos passos:')}
+  1. Execute: cleudocode-core super-skill --list
+  2. Veja: supercleudocode-plugin/QUICKSTART.md
+`)
+          return
+        }
+
+        spinner.fail(`Plugin "${nome}" não suportado`)
+        
+      } catch (error) {
+        spinner.fail('Erro ao instalar plugin')
+        p.log.error(error.message)
+      }
+      return
+    }
+
+    if (acao === 'uninstall' && nome) {
+      const pluginPath = join(pluginsDir, nome)
+      
+      if (!fs.existsSync(pluginPath)) {
+        p.log.error(`Plugin "${nome}" não encontrado`)
+        return
+      }
+
+      const spinner = ora(`Removendo plugin ${nome}...`).start()
+      
+      try {
+        fs.unlinkSync(pluginPath)
+        spinner.succeed(`Plugin "${nome}" removido`)
+      } catch (error) {
+        spinner.fail('Erro ao remover plugin')
+        p.log.error(error.message)
+      }
+      return
+    }
+
+    p.log.warn(`Ação "${acao}" não suportada`)
+    p.log.info('Use: cleudocode-core plugin install <nome>')
+    p.log.info('     cleudocode-core plugin uninstall <nome>')
+    p.log.info('     cleudocode-core plugin list')
   })
 
 // =============================================================================
@@ -473,11 +595,24 @@ ${chalk.bold('Exemplos:')}
   ${chalk.cyan('cleudocode-core doctor')}                Verifica saúde da instalação
   ${chalk.cyan('cleudocode-core config settings')}       Mostra configurações
   ${chalk.cyan('cleudocode-core run dev -t "criar API"')} Executa agente
+  ${chalk.cyan('cleudocode-core plugin install supercleudocode-plugin')} Instala SuperCleudocode
+  ${chalk.cyan('cleudocode-core super-skill --list')}    Lista Super-Skills
+
+${chalk.bold('SuperCleudocode Commands:')}
+  ${chalk.cyan('super-skill [nome]')}       Ativa ou mostra skill
+  ${chalk.cyan('super-plan [descricao]')}   Cria plano de implementação
+  ${chalk.cyan('super-execute [plano]')}    Executa plano
+  ${chalk.cyan('super-review [alvo]')}      Solicita review
+  ${chalk.cyan('super-test [alvo]')}        Executa testes
+  ${chalk.cyan('super-debug [issue]')}      Inicia debug
+  ${chalk.cyan('super-deploy [env]')}       Deploy para ambiente
+  ${chalk.cyan('super-init [projeto]')}     Inicializa projeto
 
 ${chalk.bold('Links:')}
   Documentação: https://github.com/cleudocode/cleudocode-core
   Issues: https://github.com/cleudocode/cleudocode-core/issues
   NPM: https://www.npmjs.com/package/cleudocode-core
+  SuperCleudocode: supercleudocode-plugin/README.md
 `)
 
 // =============================================================================

@@ -1,0 +1,23 @@
+{
+  "name": "supercleudocode-plugin",
+  "version": "1.0.0",
+  "description": "Superplugin for Cleudocode Hub - Complete software development workflow",
+  "author": "Cleudocode Hub Team",
+  "license": "MIT",
+  "cleudocode": {
+    "type": "plugin",
+    "minVersion": "1.0.0"
+  },
+  "scripts": {
+    "install": "cleudocode plugin install",
+    "update": "cleudocode plugin update",
+    "uninstall": "cleudocode plugin uninstall"
+  },
+  "files": [
+    "skills/**/*",
+    "commands/**/*",
+    "agents/**/*",
+    "docs/**/*",
+    ".cleudocode-plugin/**/*"
+  ]
+}

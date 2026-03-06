@@ -430,6 +430,108 @@ hooks:
   on_agent_deactivate: null
 
 # =============================================================================
+# SUPERCLUEDOCODE PLUGIN
+# =============================================================================
+supercleudocode:
+  enabled: true
+  version: "1.0.0"
+  
+  # Auto-trigger para skills
+  auto_trigger:
+    enabled: true
+    skills:
+      - name: "brainstorming"
+        triggers:
+          - "before coding"
+          - "before implementing"
+          - "creating feature"
+          - "new functionality"
+      - name: "test-driven-development"
+        triggers:
+          - "writing test"
+          - "implementing feature"
+          - "fixing bug"
+      - name: "systematic-debugging"
+        triggers:
+          - "debugging"
+          - "fixing error"
+          - "investigating issue"
+      - name: "writing-plans"
+        triggers:
+          - "planning"
+          - "breaking down task"
+          - "implementation plan"
+
+  # Skills disponíveis
+  skills:
+    path: "supercleudocode-plugin/skills"
+    enabled:
+      - "using-supercleudocode"
+      - "brainstorming"
+      - "writing-plans"
+      - "test-driven-development"
+      - "systematic-debugging"
+      - "executing-plans"
+      - "subagent-driven-development"
+      - "requesting-code-review"
+      - "receiving-code-review"
+      - "using-git-worktrees"
+      - "finishing-a-development-branch"
+      - "dispatching-parallel-agents"
+      - "verification-before-completion"
+      - "writing-super-skills"
+
+  # Comandos disponíveis
+  commands:
+    path: "supercleudocode-plugin/commands"
+    enabled:
+      - "super-init"
+      - "super-skill"
+      - "super-plan"
+      - "super-execute"
+      - "super-review"
+      - "super-deploy"
+      - "super-debug"
+      - "super-test"
+    
+    # Atalhos
+    shortcuts:
+      "*init": "super-init"
+      "*skill": "super-skill"
+      "*plan": "super-plan"
+      "*exec": "super-execute"
+      "*review": "super-review"
+      "*deploy": "super-deploy"
+      "*debug": "super-debug"
+      "*test": "super-test"
+
+  # Integração com MADMAX
+  madmax:
+    enabled: true
+    agent: "madmax"
+    orchestration:
+      enabled: true
+      default_workflow: "greenfield-fullstack"
+
+  # Configurações de qualidade
+  quality_gates:
+    test_coverage_min: 80
+    lint_required: true
+    typecheck_required: true
+    security_scan_required: true
+    code_review_required: true
+
+  # Workflow padrão
+  default_workflow:
+    - "brainstorming"
+    - "using-git-worktrees"
+    - "writing-plans"
+    - "subagent-driven-development"
+    - "test-driven-development"
+    - "requesting-code-review"
+    - "finishing-a-development-branch"
+
+# =============================================================================
 # CONSTITUIÇÃO (similar ao AIOX-Core)
 # =============================================================================
 constitution:

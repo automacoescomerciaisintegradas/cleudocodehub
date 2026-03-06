@@ -1,0 +1,19 @@
+{
+  "name": "supercleudocode-plugin",
+  "version": "1.0.0",
+  "description": "Superplugin for Cleudocode Hub",
+  "platform": "claude-code",
+  "entryPoint": "../skills/using-supercleudocode/SKILL.md",
+  "skills": "../skills",
+  "commands": "../commands",
+  "activation": {
+    "mode": "auto",
+    "triggers": [
+      "before coding",
+      "before implementing",
+      "before writing tests",
+      "before debugging",
+      "before planning"
+    ]
+  }
+}

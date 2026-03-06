@@ -1,0 +1,19 @@
+{
+  "name": "supercleudocode-plugin",
+  "version": "1.0.0",
+  "description": "Superplugin for Cleudocode Hub",
+  "platform": "cursor",
+  "entryPoint": "../skills/using-supercleudocode/SKILL.md",
+  "skills": "../skills",
+  "commands": "../commands",
+  "activation": {
+    "mode": "auto",
+    "triggers": [
+      "creative work",
+      "feature implementation",
+      "bug fixing",
+      "code review",
+      "test writing"
+    ]
+  }
+}

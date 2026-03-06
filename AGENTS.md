@@ -65,6 +65,7 @@ npm run build
 
 | Agente | Atalho | Descrição |
 |--------|--------|-----------|
+| MADMAX | `@madmax` | Master Agent for Development & Maximum Automation |
 | Master | `@master` | Orquestrador principal |
 | Architect | `@architect` | Arquitetura e design |
 | Analyst | `@analyst` | Análise de requisitos |
@@ -76,12 +77,25 @@ npm run build
 | SM | `@sm` | Scrum Master |
 | UX | `@ux` | UX Designer |
 
+### SuperSkills (SuperCleudocode Plugin)
+
+| Skill | Ativação | Descrição |
+|-------|----------|-----------|
+| Brainstorming | `@brainstorming` | Refinamento de design antes de qualquer trabalho criativo |
+| TDD | `@test-driven-development` | RED-GREEN-REFACTOR cycle |
+| Debugging | `@systematic-debugging` | Debug em 4 fases |
+| Planning | `@writing-plans` | Criação de planos de implementação |
+| Execution | `@executing-plans` | Execução de planos |
+| Code Review | `@requesting-code-review` | Solicitar review de código |
+
 ### Como Ativar
 
 ```
 @architect - Ativa o agente arquiteto
 /dev - Ativa o agente desenvolvedor
 @qa --verbose - Ativa QA com verbose
+@brainstorming - Ativa skill de brainstorming
+@test-driven-development - Ativa TDD
 ```
 
 ### Resposta Esperada
@@ -98,6 +112,26 @@ Ao ativar um agente:
 - `*status` - Status atual
 - `*exit` - Sair do modo agente
 - `*reset` - Resetar contexto
+
+### SuperCleudocode Commands
+- `*super-skill [nome]` - Ativar ou mostrar skill
+- `*super-plan [descricao]` - Criar plano de implementação
+- `*super-execute [plano]` - Executar plano
+- `*super-review [alvo]` - Solicitar code review
+- `*super-test [alvo]` - Executar testes
+- `*super-debug [issue]` - Iniciar debug sistemático
+- `*super-deploy [env]` - Deploy para ambiente
+- `*super-init [projeto]` - Inicializar projeto
+
+### Atalhos
+- `*skill` = `*super-skill`
+- `*plan` = `*super-plan`
+- `*exec` = `*super-execute`
+- `*review` = `*super-review`
+- `*test` = `*super-test`
+- `*debug` = `*super-debug`
+- `*deploy` = `*super-deploy`
+- `*init` = `*super-init`
 
 ### Desenvolvimento
 - `*generate` - Gerar código

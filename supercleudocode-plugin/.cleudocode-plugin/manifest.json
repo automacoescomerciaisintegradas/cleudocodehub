@@ -1,0 +1,84 @@
+{
+  "name": "supercleudocode-plugin",
+  "version": "1.0.0",
+  "description": "Superplugin for Cleudocode Hub - Complete software development workflow with composable super-skills",
+  "author": "Cleudocode Hub Team",
+  "license": "MIT",
+  "homepage": "https://github.com/cleudocode/cleudocodehub.skill",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cleudocode/cleudocodehub.skill.git"
+  },
+  "bugs": {
+    "url": "https://github.com/cleudocode/cleudocodehub.skill/issues"
+  },
+  "platforms": {
+    "cleudocode-core": {
+      "minVersion": "1.0.0",
+      "entryPoint": "./skills/using-supercleudocode/SKILL.md"
+    },
+    "claude-code": {
+      "minVersion": "1.0.0",
+      "entryPoint": "./.claude-plugin/manifest.json"
+    },
+    "cursor": {
+      "minVersion": "1.0.0",
+      "entryPoint": "./.cursor-plugin/manifest.json"
+    },
+    "codex": {
+      "minVersion": "1.0.0",
+      "entryPoint": "./.codex/INSTALL.md"
+    },
+    "opencode": {
+      "minVersion": "1.0.0",
+      "entryPoint": "./.opencode/INSTALL.md"
+    }
+  },
+  "skills": [
+    "test-driven-development",
+    "systematic-debugging",
+    "brainstorming",
+    "writing-plans",
+    "executing-plans",
+    "verification-before-completion",
+    "dispatching-parallel-agents",
+    "using-git-worktrees",
+    "finishing-a-development-branch",
+    "subagent-driven-development",
+    "requesting-code-review",
+    "receiving-code-review",
+    "writing-super-skills",
+    "using-supercleudocode"
+  ],
+  "commands": [
+    "super-init",
+    "super-skill",
+    "super-plan",
+    "super-execute",
+    "super-review",
+    "super-deploy",
+    "super-debug",
+    "super-test"
+  ],
+  "agents": [
+    "madmax",
+    "code-review",
+    "testing",
+    "documentation",
+    "general-purpose"
+  ],
+  "keywords": [
+    "cleudocode",
+    "superplugin",
+    "skills",
+    "tdd",
+    "agile",
+    "automation",
+    "madmax",
+    "workflow"
+  ],
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  }
+}

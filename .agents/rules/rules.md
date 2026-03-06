@@ -70,5 +70,16 @@ Ver `.agents/rules/code-style.md` para detalhes completos.
 |-----------|-----------|
 | [Constituição](../constitution.md) | Princípios fundamentais |
 | [Code Style](./code-style.md) | Regras de código detalhadas |
+| [MADMAX Rules](./madmax-rules.md) | Regras especializadas MADMAX |
 | [AGENTS.md](../../AGENTS.md) | Configuração de agentes |
 | [.cleudocode-core](../../.cleudocode-core) | Configuração central |
+
+## 🚀 Agentes Disponíveis
+
+| Agente | Descrição | Arquivo |
+|--------|-----------|---------|
+| **MADMAX** 🚀 | Master Agent for Development & Maximum Automation Xpert | [agents/madmax.md](../agents/madmax.md) |
+| Code Review | Especialista em revisão de código | [agents/code-review.md](../agents/code-review.md) |
+| Testing | Especialista em testes | [agents/testing.md](../agents/testing.md) |
+| Documentation | Especialista em documentação | [agents/documentation.md](../agents/documentation.md) |
+| General Purpose | Agente de uso geral | [agents/general-purpose.md](../agents/general-purpose.md) |
