@@ -907,6 +907,69 @@ program
   })
 
 // =============================================================================
+// COMANDO: yolo - MODO DE DESENVOLVIMENTO AUTOMÁTICO
+// =============================================================================
+program
+  .command('yolo [feature]')
+  .description('🚀 MADMAX YOLO Mode - Desenvolvimento Automático End-to-End')
+  .option('-f, --feature <descricao>', 'Descrição da feature')
+  .option('--no-commit', 'Não fazer commit automático')
+  .option('--no-test', 'Não criar testes')
+  .option('--verbose', 'Output detalhado')
+  .action(async (feature, options) => {
+    p.intro(chalk.bgRed.black(' MADMAX YOLO MODE '))
+
+    console.log(chalk.red.bold('\n⚠️  YOLO MODE ACTIVATED ⚠️'))
+    console.log(chalk.red('Nenhuma pergunta. Nenhuma confirmação. Apenas código.\n'))
+
+    let featureDesc = options.feature || feature
+
+    if (!featureDesc) {
+      featureDesc = await p.text({
+        message: 'O que você quer desenvolver? (YOLO vai fazer tudo)',
+        placeholder: 'ex: API de autenticação de usuários'
+      })
+
+      if (p.isCancel(featureDesc)) {
+        p.cancel('Operação cancelada')
+        return
+      }
+    }
+
+    console.log(chalk.red(`🚀 Iniciando YOLO mode para: ${featureDesc}\n`))
+
+    try {
+      // Importar módulo YOLO
+      const { YOLODevelopmentModule } = await import(
+        join(__dirname, '../supercleudocode-plugin/lib/yolo-mode.js')
+      )
+
+      const yolo = new YOLODevelopmentModule({
+        autoCommit: options.commit !== false,
+        autoTest: options.test !== false,
+        verbose: options.verbose || false
+      })
+
+      // Executar desenvolvimento automático
+      const result = await yolo.run(featureDesc, {
+        type: 'auto',
+        skipQuestions: true,
+        autoApprove: true
+      })
+
+      if (result.success) {
+        p.outro(chalk.green('✅ YOLO Mode completado com sucesso!'))
+      } else {
+        p.outro(chalk.yellow('⚠️  YOLO Mode completado com erros tratados'))
+      }
+
+    } catch (error) {
+      p.log.error(chalk.red(`Erro: ${error.message}`))
+      p.outro(chalk.red('❌ YOLO Mode falhou'))
+    }
+  })
+
+// =============================================================================
 // HELP PERSONALIZADO
 // =============================================================================
 program.addHelpText('after', `
@@ -919,6 +982,7 @@ ${chalk.bold('Exemplos:')}
   ${chalk.cyan('cleudocode-core run dev -t "criar API"')} Executa agente
   ${chalk.cyan('cleudocode-core plugin install supercleudocode-plugin')} Instala SuperCleudocode
   ${chalk.cyan('cleudocode-core super-skill --list')}    Lista Super-Skills
+  ${chalk.cyan('cleudocode-core yolo "minha feature"')}  🚀 YOLO MODE - Desenvolvimento automático
 
 ${chalk.bold('SuperCleudocode Commands:')}
   ${chalk.cyan('super-skill [nome]')}       Ativa ou mostra skill
@@ -929,12 +993,14 @@ ${chalk.bold('SuperCleudocode Commands:')}
   ${chalk.cyan('super-debug [issue]')}      Inicia debug
   ${chalk.cyan('super-deploy [env]')}       Deploy para ambiente
   ${chalk.cyan('super-init [projeto]')}     Inicializa projeto
+  ${chalk.cyan('yolo [feature]')}           🚀 YOLO MODE - Desenvolvimento automático end-to-end
 
 ${chalk.bold('Links:')}
   Documentação: https://github.com/cleudocode/cleudocode-core
   Issues: https://github.com/cleudocode/cleudocode-core/issues
   NPM: https://www.npmjs.com/package/cleudocode-core
   SuperCleudocode: supercleudocode-plugin/README.md
+  YOLO Mode: supercleudocode-plugin/lib/yolo-mode.js
 `)
 
 // =============================================================================
