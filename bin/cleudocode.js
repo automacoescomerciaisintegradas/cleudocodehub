@@ -459,9 +459,127 @@ program
     }
   })
 
+// =============================================================================
+// COMANDO: workflow
+// =============================================================================
+program
+  .command('workflow <tipo>')
+  .description('Executa workflow encadeado de agentes BMAD')
+  .option('-r, --requirement <texto>', 'Requisito ou objetivo do workflow')
+  .option('-p, --provider <provider>', 'Provider LLM: groq, gemini, openai, ollama')
+  .option('-s, --skip <agentes>', 'Pular agentes (ex: analyst,sm)')
+  .option('--dry-run', 'Apenas mostra o plano sem executar')
+  .action(async (tipo, options) => {
+    p.intro(chalk.bgGreen.black(` Cleudocode Hub — Workflow BMAD: ${tipo} `))
+
+    // Sequências de workflow
+    const workflows = {
+      bmad: ['analyst', 'pm', 'architect', 'sm', 'dev', 'qa'],
+      plan: ['analyst', 'pm', 'architect'],
+      build: ['architect', 'sm', 'dev', 'qa'],
+      review: ['qa'],
+      full: ['analyst', 'pm', 'architect', 'sm', 'dev', 'qa', 'devops'],
+    }
+
+    const sequence = workflows[tipo]
+    if (!sequence) {
+      p.log.error(`Workflow "${tipo}" não encontrado`)
+      p.log.info(`Workflows disponíveis: ${Object.keys(workflows).join(', ')}`)
+      process.exit(1)
+    }
+
+    // Filtrar agentes ignorados
+    const skip = options.skip ? options.skip.split(',') : []
+    const agents = sequence.filter(a => !skip.includes(a))
+
+    const requirement = options.requirement || await p.text({
+      message: 'Qual o requisito ou objetivo?',
+      placeholder: 'Ex: Sistema de autenticação JWT com refresh token',
+    })
+
+    if (p.isCancel(requirement)) { p.cancel('Cancelado'); return }
+
+    console.log()
+    console.log(chalk.bold('📋 Workflow BMAD:'))
+    agents.forEach((a, i) => {
+      const arrow = i < agents.length - 1 ? ' →' : ' ✓'
+      process.stdout.write(chalk.cyan(`@${a}${arrow} `))
+    })
+    console.log('\n')
+
+    if (options.dryRun) {
+      p.outro(chalk.yellow('Dry-run: nenhuma execução realizada'))
+      return
+    }
+
+    const { ask, getBestProvider } = await import('../core/llm/llm-provider.js')
+    const provider = options.provider || getBestProvider()
+
+    // Diretório de saída do workflow
+    const ts = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19)
+    const workflowDir = join(PROJECT_ROOT, 'docs/workflows', `${tipo}-${ts}`)
+    fs.ensureDirSync(workflowDir)
+
+    // Contexto acumulado — cada agente recebe o output do anterior
+    let accumulatedContext = `## Requisito Original\n${requirement}\n`
+    const results = []
+
+    for (const agentName of agents) {
+      console.log(chalk.bold(`\n${'─'.repeat(60)}`))
+      console.log(chalk.bgCyan.black(` @${agentName} `))
+
+      // Carregar system prompt do agente
+      const agentPaths = [
+        join(__dirname, '../agents', agentName, 'AGENT.md'),
+        join(PROJECT_ROOT, 'agents', agentName, 'AGENT.md'),
+        join(PROJECT_ROOT, '.agents/agents', `${agentName}.md`),
+      ]
+      let agentPrompt = null
+      for (const ap of agentPaths) {
+        if (fs.existsSync(ap)) { agentPrompt = fs.readFileSync(ap, 'utf-8'); break }
+      }
+      if (!agentPrompt) {
+        p.log.warn(`@${agentName} não encontrado, pulando...`)
+        continue
+      }
+
+      // Tarefa contextualizada com outputs anteriores
+      const userMessage = `${accumulatedContext}\n\n## Sua Tarefa\nCom base no contexto acima, execute seu papel como @${agentName} para o requisito: "${requirement}"`
+
+      const spinner = ora(`@${agentName} processando...`).start()
+
+      try {
+        const response = await ask(agentPrompt, userMessage, { provider })
+        spinner.succeed(`@${agentName} concluiu`)
+
+        console.log('\n' + response)
+
+        // Salvar output individual
+        const agentFile = join(workflowDir, `${String(results.length + 1).padStart(2, '0')}-${agentName}.md`)
+        fs.writeFileSync(agentFile, `# @${agentName}\n\n## Tarefa\n${requirement}\n\n## Output\n${response}\n`)
+
+        // Acumular contexto para próximo agente
+        accumulatedContext += `\n\n## Output do @${agentName}\n${response}`
+        results.push({ agent: agentName, output: response, file: agentFile })
+
+      } catch (error) {
+        spinner.fail(`@${agentName} falhou: ${error.message}`)
+        p.log.warn('Continuando com próximo agente...')
+      }
+    }
+
+    // Gerar documento final consolidado
+    const finalDoc = join(workflowDir, '00-WORKFLOW-COMPLETO.md')
+    const header = `# Workflow BMAD: ${tipo}\n**Requisito:** ${requirement}\n**Data:** ${new Date().toLocaleString('pt-BR')}\n**Provider:** ${provider}\n\n---\n\n`
+    fs.writeFileSync(finalDoc, header + accumulatedContext)
+
+    console.log(`\n${'─'.repeat(60)}`)
+    p.outro(chalk.green(`\n✅ Workflow concluído!\n\n📁 Arquivos em: ${workflowDir}\n📄 Consolidado: 00-WORKFLOW-COMPLETO.md\n`))
+  })
 
 // =============================================================================
 // COMANDO: update
+
 // =============================================================================
 program
   .command('update')
