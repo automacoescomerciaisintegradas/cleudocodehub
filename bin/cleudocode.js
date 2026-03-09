@@ -370,30 +370,95 @@ program
 // =============================================================================
 program
   .command('run <agente>')
-  .description('Executa um agente')
+  .description('Executa um agente com uma tarefa')
   .option('-t, --task <tarefa>', 'Tarefa a executar')
-  .option('-v, --verbose', 'Modo verbose')
+  .option('-v, --verbose', 'Mostrar logs do provider LLM')
+  .option('-p, --provider <provider>', 'Provider LLM: groq, gemini, openai, ollama')
+  .option('-m, --model <model>', 'Modelo específico do provider')
   .action(async (agent, options) => {
-    p.intro(chalk.bgGreen.black(` Cleudocode Core - ${agent} `))
+    p.intro(chalk.bgGreen.black(` Cleudocode Hub — @${agent} `))
 
-    const agentPath = join(PROJECT_ROOT, '.agents/agents', `${agent}.md`)
-    
-    if (!fs.existsSync(agentPath)) {
-      p.log.error(`Agente "${agent}" não encontrado`)
-      p.log.info('Use "cleudocode-core agents --list" para ver agentes disponíveis')
+    // Busca o agente em múltiplos locais (BMAD-style + legado)
+    const agentSearchPaths = [
+      join(__dirname, '../agents', agent, 'AGENT.md'),
+      join(PROJECT_ROOT, 'agents', agent, 'AGENT.md'),
+      join(PROJECT_ROOT, '.agents/agents', `${agent}.md`),
+    ]
+
+    let agentPath = null
+    let agentContent = null
+
+    for (const candidate of agentSearchPaths) {
+      if (fs.existsSync(candidate)) {
+        agentPath = candidate
+        agentContent = fs.readFileSync(candidate, 'utf-8')
+        break
+      }
+    }
+
+    if (!agentPath) {
+      p.log.error(`Agente "@${agent}" não encontrado`)
+      p.log.info(`Procurei em:\n${agentSearchPaths.map(p => `  • ${p}`).join('\n')}`)
+      p.log.info('Agentes disponíveis: pm, analyst, architect, sm, dev, qa, devops')
       process.exit(1)
     }
 
-    const agentContent = fs.readFileSync(agentPath, 'utf-8')
-    
-    if (options.task) {
-      p.log.info(`Executando tarefa: ${options.task}`)
-      // Implementar execução de tarefa
-      console.log(chalk.dim('(Funcionalidade em desenvolvimento)'))
-    } else {
+    p.log.success(`Agente carregado: ${agentPath}`)
+
+    // Se não tem tarefa, exibe o agente
+    if (!options.task) {
+      console.log('\n' + chalk.dim('─'.repeat(60)))
       console.log(agentContent)
+      console.log(chalk.dim('─'.repeat(60)))
+      p.log.info('Use --task "sua tarefa" para executar')
+      return
+    }
+
+    // Executar com LLM real
+    const { ask, getBestProvider, listProviders } = await import('../core/llm/llm-provider.js')
+
+    const provider = options.provider || getBestProvider()
+    p.log.info(`Provider: ${chalk.cyan(provider)} | Tarefa: ${chalk.bold(options.task)}`)
+
+    const spinner = ora(`@${agent} processando...`).start()
+
+    try {
+      const response = await ask(agentContent, options.task, {
+        provider,
+        model: options.model,
+        verbose: options.verbose,
+      })
+
+      spinner.succeed(`@${agent} concluiu!`)
+
+      console.log('\n' + chalk.dim('─'.repeat(60)))
+      console.log(response)
+      console.log(chalk.dim('─'.repeat(60)))
+
+      // Salvar resposta em docs/outputs/
+      const outputDir = join(PROJECT_ROOT, 'docs/outputs')
+      fs.ensureDirSync(outputDir)
+      const ts = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19)
+      const outputFile = join(outputDir, `${agent}-${ts}.md`)
+      const outputContent = `# @${agent} — ${new Date().toLocaleString('pt-BR')}\n\n## Tarefa\n${options.task}\n\n## Resposta\n${response}\n`
+      fs.writeFileSync(outputFile, outputContent)
+
+      p.outro(chalk.green(`✅ Resposta salva em: ${outputFile}`))
+
+    } catch (error) {
+      spinner.fail(`Erro ao executar @${agent}`)
+      p.log.error(error.message)
+
+      if (error.message.includes('não instalado')) {
+        p.log.info('Execute: npm install groq-sdk @google/generative-ai openai')
+      } else if (error.message.includes('API key')) {
+        p.log.info('Configure as chaves no .env: GROQ_API_KEY, GOOGLE_API_KEY, etc.')
+      }
+
+      process.exit(1)
     }
   })
+
 
 // =============================================================================
 // COMANDO: update
